@@ -8,8 +8,8 @@
       source  = "hashicorp/aws"
       version = "~> 5.55"
     }
-    local = {
-      source  = "hashicorp/local"
+    ocal = {
+      source = "hashicorp/local"
       version = "~> 2.5.1"
     }
   }
@@ -23,5 +23,5 @@ provider "aws" "default" {
 }
 
 provider "local" "default" {
- 
+  # Configuration options
 }
