@@ -30,11 +30,13 @@ resource "aws_iam_policy" "consul-join" {
   policy = data.aws_iam_policy_document.vault-server.json
 
 }
-
+data "local_file" "assume-role-policy" {
+  filename = "${path.module}/policies/assume-role.json"
+}
 
 resource "aws_iam_role" "consul-join" {
   name               = "${var.namespace}-consul-join"
-  assume_role_policy = file("${path.module}/policies/assume-role.json")
+  assume_role_policy = data.local_file.assume-role-policy
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
