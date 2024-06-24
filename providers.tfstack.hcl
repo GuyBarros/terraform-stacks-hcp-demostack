@@ -21,3 +21,7 @@ provider "aws" "default" {
 
   }
 }
+
+provider "local" "default" {
+ 
+}
