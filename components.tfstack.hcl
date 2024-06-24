@@ -1,0 +1,84 @@
+component "vpc" {
+  source = "./aws/0_vpc"
+
+  inputs = {
+    namespace = var.namespace
+    vpc_cidr_block = var.vpc_cidr_block
+
+  }
+
+  providers = {
+    aws    = provider.aws.default
+  }
+}
+/*
+component "networking" {
+  source = "./aws/1_networking"
+
+  inputs = {
+    namespace = var.namespace
+    vpc_id = component.vpc.id
+    cidr_blocks = var.cidr_blocks
+  }
+
+  providers = {
+    aws    = provider.aws.default
+  }
+}
+
+component "networking" {
+  source = "./aws/2_security"
+
+  inputs = {
+    namespace = var.namespace
+    vpc_id = component.vpc.vpc_id
+    cidr_blocks = cidr_blocks
+  }
+
+  providers = {
+    aws    = provider.aws.this
+  }
+}
+
+component "rds" {
+  source = "./aws/3_rds"
+
+  inputs = {
+    namespace = var.namespace
+    vpc_id = component.vpc.vpc_id
+    cidr_blocks = cidr_blocks
+  }
+
+  providers = {
+    aws    = provider.aws.this
+  }
+}
+
+component "compute" {
+  source = "./aws/4_compute"
+
+  inputs = {
+    namespace = var.namespace
+    vpc_id = component.vpc.vpc_id
+    cidr_blocks = cidr_blocks
+  }
+
+  providers = {
+    aws    = provider.aws.this
+  }
+}
+
+component "load_balancer" {
+  source = "./aws/5_loadbalancer"
+
+  inputs = {
+    namespace = var.namespace
+    vpc_id = component.vpc.vpc_id
+    cidr_blocks = cidr_blocks
+  }
+
+  providers = {
+    aws    = provider.aws.this
+  }
+}
+*/
