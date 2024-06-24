@@ -34,7 +34,7 @@ resource "aws_iam_policy" "consul-join" {
 
 resource "aws_iam_role" "consul-join" {
   name               = "${var.namespace}-consul-join"
-  assume_role_policy = file("${path.module}/templates/policies/assume-role.json")
+  assume_role_policy = file("${path.module}/policies/assume-role.json")
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
