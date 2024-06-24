@@ -1,9 +1,10 @@
 component "vpc" {
-  source = "./aws/0_vpc"
+  source = "./modules/aws/0_vpc"
 
   inputs = {
     namespace = var.namespace
     vpc_cidr_block = var.vpc_cidr_block
+    public_key = var.public_key
 
   }
 
