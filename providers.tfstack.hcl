@@ -6,7 +6,7 @@
     }
     aws = {
       source  = "hashicorp/aws"
-       version = "~> 5.50"
+       version = "~> 5.55"
     }
   }
 
