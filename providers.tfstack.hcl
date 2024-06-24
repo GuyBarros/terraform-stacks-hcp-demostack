@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.7"
+  required_version = ">= 1.8"
   required_providers {
     hcp = {
       source  = "hashicorp/hcp"
@@ -7,12 +7,12 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
-      # version = "4.10.2"
+       version = "5.50"
     }
   }
 }
 
-provider "aws" "this" {
+provider "aws" "default" {
   config {
     region = var.region
 
