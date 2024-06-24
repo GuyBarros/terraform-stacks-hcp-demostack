@@ -1,5 +1,4 @@
-terraform {
-  required_version = ">= 1.8"
+
   required_providers {
     hcp = {
       source  = "hashicorp/hcp"
@@ -7,10 +6,10 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
-       version = "5.50"
+       version = "~> 5.50"
     }
   }
-}
+
 
 provider "aws" "default" {
   config {
