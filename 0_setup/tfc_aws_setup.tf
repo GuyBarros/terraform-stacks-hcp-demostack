@@ -15,8 +15,8 @@ data "tfe_project" "demostack" {
 
 module "tfc-dynamic-creds-workspace" {
     depends_on = [ module.tfc-dynamic-creds-provider ]
-  source  = "hashi-strawb/tfc-dynamic-creds-workspace/aws"
-  version = "0.4.0"
+  source = "github.com/GuyBarros/terraform-aws-tfc-dynamic-creds-workspace"
+  
   # insert the 3 required variables here
   oidc_provider_arn = module.tfc-dynamic-creds-provider.oidc_provider.arn
   tfc_organization_name = var.tfc_organization_name

@@ -15,9 +15,15 @@
   }
 
 
+
 provider "aws" "default" {
   config {
     region = var.region
+
+     assume_role_with_web_identity {
+      role_arn                = var.role_arn
+      web_identity_token_file = var.identity_token_file
+    }
 
   }
 }
