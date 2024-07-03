@@ -1,12 +1,16 @@
-variable "tfc_organization_name" {
-  type        = string
-  description = "The name of your Terraform Cloud organization"
+variable "aws_region" {
+  type    = string
+  default = "eu-west-2"
+}
+
+variable "organization_name" {
+  type = string
   default = "GuyBarros"
 }
 
-variable "tfc_workspace_project_name" {
-  type        = string
-  description = "The name of the project the workspace lives in"
-  default     = "Demostack"
 
+
+variable "project_name" {
+  type    = string
+  default = "Demostack"
 }
