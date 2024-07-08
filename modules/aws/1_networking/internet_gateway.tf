@@ -1,5 +1,5 @@
 
-data "aws_vpc" "selected" {
+data "aws_vpc" "demostack" {
   id = var.vpc_id
 }
 
