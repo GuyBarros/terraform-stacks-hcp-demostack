@@ -12,14 +12,15 @@ component "vpc" {
     aws    = provider.aws.default
     local  = provider.local.default
   }
+
 }
-/*
+
 component "networking" {
-  source = "./aws/1_networking"
+  source = "./modules/aws/1_networking"
 
   inputs = {
     namespace = var.namespace
-    vpc_id = component.vpc.id
+    vpc_id = component.vpc.vpc.id
     cidr_blocks = var.cidr_blocks
   }
 
@@ -27,7 +28,7 @@ component "networking" {
     aws    = provider.aws.default
   }
 }
-
+/*
 component "networking" {
   source = "./aws/2_security"
 
