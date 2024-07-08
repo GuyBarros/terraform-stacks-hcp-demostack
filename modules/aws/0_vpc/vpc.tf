@@ -30,13 +30,32 @@ resource "aws_iam_policy" "consul-join" {
   policy = data.aws_iam_policy_document.vault-server.json
 
 }
-data "local_file" "assume-role-policy" {
-  filename = "${path.module}/policies/assume-role.json"
-}
+
 
 resource "aws_iam_role" "consul-join" {
   name               = "${var.namespace}-consul-join"
-  assume_role_policy = data.local_file.assume-role-policy
+  assume_role_policy = <<EOF
+  {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    },
+     {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:sts::711129375688:assumed-role/se_demos_dev-developer/guy@hashicorp.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
