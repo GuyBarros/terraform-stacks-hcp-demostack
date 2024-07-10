@@ -37,6 +37,7 @@ variable "role_arn" {
 variable "cidr_blocks" {
   description = "The CIDR blocks to create the workstations in."
   default     = ["10.1.1.0/24", "10.1.2.0/24"]
+  type = list(string)
 }
 
 /*
