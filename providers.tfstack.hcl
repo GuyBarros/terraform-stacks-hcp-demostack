@@ -14,7 +14,9 @@
     }
   }
 
-
+identity_token "aws" {
+  audience = ["terraform-stacks-private-preview"]
+}
 
 provider "aws" "default" {
   config {
