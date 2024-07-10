@@ -14,10 +14,6 @@
     }
   }
 
-identity_token "aws" {
-  audience = ["terraform-stacks-private-preview"]
-}
-
 provider "aws" "default" {
   config {
     region              = "eu-west-2"
@@ -28,10 +24,4 @@ provider "aws" "default" {
     }
 
   }
-}
-
-provider "local" "default" {
-  # Configuration options
-  # adding another provider change to be ignored to try and trigger a 
-  # config change
 }
