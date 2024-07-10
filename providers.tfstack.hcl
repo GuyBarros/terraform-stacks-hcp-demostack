@@ -16,11 +16,11 @@
 
 provider "aws" "default" {
   config {
-    region              = "eu-west-2"
+    region = var.region
 
      assume_role_with_web_identity {
-      identity_token_file = identity_token.aws.jwt_filename
-      role_arn            = "arn:aws:iam::958215610051:role/tfc-wif-guybarros"
+      web_identity_token_file = var.identity_token_file
+      role_arn                = var.role_arn
     }
 
   }
