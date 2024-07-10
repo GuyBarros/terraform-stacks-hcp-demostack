@@ -10,7 +10,6 @@ component "vpc" {
 
   providers = {
     aws    = provider.aws.default
-    local  = provider.local.default
   }
 
 }

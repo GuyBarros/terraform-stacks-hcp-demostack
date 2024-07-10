@@ -20,7 +20,7 @@ provider "aws" "default" {
 
      assume_role_with_web_identity {
       identity_token_file = identity_token.aws.jwt_filename
-  role_arn            = "arn:aws:iam::958215610051:role/tfc-wif-guybarros"
+      role_arn            = "arn:aws:iam::958215610051:role/tfc-wif-guybarros"
     }
 
   }
