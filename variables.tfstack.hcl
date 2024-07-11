@@ -6,6 +6,18 @@ EOH
 type = string
 }
 
+variable "region" {
+  type = string
+}
+
+variable "identity_token_file" {
+  type = string
+}
+
+variable "role_arn" {
+  type = string
+}
+
 ///////////////////////// VPC
 variable "vpc_cidr_block" {
   description = "The top-level CIDR block for the VPC."
@@ -18,20 +30,6 @@ variable "public_key" {
   type = string
 }
 
-variable "region" {
-  description = "The region to create resources."
-  default     = "eu-west-2"
-  type = string
-}
-
-
-variable "identity_token_file" {
-  type = string
-}
-
-variable "role_arn" {
-  type = string
-}
 
 //////////////////////// NETWORKING
 variable "cidr_blocks" {
