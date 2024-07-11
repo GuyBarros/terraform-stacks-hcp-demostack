@@ -12,7 +12,7 @@ component "vpc" {
   }
 
 }
-
+/*
 component "networking" {
   source = "./modules/aws/1_networking"
 
@@ -25,7 +25,7 @@ component "networking" {
     aws    = provider.aws.this
   }
 }
-/*
+
 component "networking" {
   source = "./aws/2_security"
 
