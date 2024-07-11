@@ -1,4 +1,3 @@
-///////////// SHARED ///////////////////
 variable "namespace" {
   description = <<EOH
 this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
@@ -18,7 +17,6 @@ variable "role_arn" {
   type = string
 }
 
-///////////////////////// VPC
 variable "vpc_cidr_block" {
   description = "The top-level CIDR block for the VPC."
   default     = "10.1.0.0/16"
@@ -30,7 +28,7 @@ variable "public_key" {
   type = string
 }
 
-
+/*
 //////////////////////// NETWORKING
 variable "cidr_blocks" {
   description = "The CIDR blocks to create the workstations in."
