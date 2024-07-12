@@ -38,6 +38,7 @@ component "security" {
 
   providers = {
     aws    = provider.aws.this
+    tls    = provider.tls.demostack
   }
 }
 
