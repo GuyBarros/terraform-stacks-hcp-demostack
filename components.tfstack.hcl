@@ -33,7 +33,6 @@ component "security" {
   inputs = {
     namespace = var.namespace
     vpc_id = component.vpc.vpc_id
-    cidr_blocks = cidr_blocks
     host_access_ip = var.host_access_ip
   }
 
