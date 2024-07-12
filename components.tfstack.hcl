@@ -12,7 +12,7 @@ component "vpc" {
   }
 
 }
-/*
+
 component "networking" {
   source = "./modules/aws/1_networking"
 
@@ -25,9 +25,9 @@ component "networking" {
     aws    = provider.aws.this
   }
 }
-
+/*
 component "networking" {
-  source = "./aws/2_security"
+  source = "./modules/aws/2_security"
 
   inputs = {
     namespace = var.namespace
@@ -41,7 +41,7 @@ component "networking" {
 }
 
 component "rds" {
-  source = "./aws/3_rds"
+  source = "./modules/aws/3_rds"
 
   inputs = {
     namespace = var.namespace
@@ -55,7 +55,7 @@ component "rds" {
 }
 
 component "compute" {
-  source = "./aws/4_compute"
+  source = "./modules/aws/4_compute"
 
   inputs = {
     namespace = var.namespace
@@ -69,7 +69,7 @@ component "compute" {
 }
 
 component "load_balancer" {
-  source = "./aws/5_loadbalancer"
+  source = "./modules/aws/5_loadbalancer"
 
   inputs = {
     namespace = var.namespace

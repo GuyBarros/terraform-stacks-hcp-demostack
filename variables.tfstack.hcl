@@ -28,7 +28,7 @@ variable "public_key" {
   type = string
 }
 
-/*
+
 //////////////////////// NETWORKING
 variable "cidr_blocks" {
   description = "The CIDR blocks to create the workstations in."
