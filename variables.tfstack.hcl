@@ -46,10 +46,12 @@ variable "host_access_ip" {
 variable "workers" {
   description = "The number of nomad worker vms to create."
   default     = "3"
+  type = string
 }
 
 variable "zone_id" {
   description = "The Zone ID which Holds the FQDN to which the subdomains will be added "
+  type = string
 }
 
 /*
