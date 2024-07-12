@@ -3,8 +3,8 @@ component "vpc" {
 
   inputs = {
    namespace = var.namespace
-     vpc_cidr_block = var.vpc_cidr_block
-    public_key = var.public_key
+   vpc_cidr_block = var.vpc_cidr_block
+   public_key = var.public_key
   }
 
   providers = {
@@ -17,6 +17,7 @@ component "networking" {
   source = "./modules/aws/1_networking"
 
   inputs = {
+    namespace = var.namespace
     vpc_id = component.vpc.vpc.id
     cidr_blocks = var.cidr_blocks
   }
