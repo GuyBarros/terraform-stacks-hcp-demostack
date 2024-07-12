@@ -26,14 +26,15 @@ component "networking" {
     aws    = provider.aws.this
   }
 }
-/*
-component "networking" {
+
+component "security" {
   source = "./modules/aws/2_security"
 
   inputs = {
     namespace = var.namespace
     vpc_id = component.vpc.vpc_id
     cidr_blocks = cidr_blocks
+    host_access_ip = var.host_access_ip
   }
 
   providers = {
@@ -41,6 +42,7 @@ component "networking" {
   }
 }
 
+/*
 component "rds" {
   source = "./modules/aws/3_rds"
 

@@ -36,13 +36,26 @@ variable "cidr_blocks" {
   type = list(string)
 }
 
-/*
 
+/////////////////////// SECURITY
+variable "host_access_ip" {
+  description = "list of CIDR blocks allowed to connect via SSH on port 22 e.g. your public ip format: [\"95.42.355.111/32\"]"
+  type        = list(string)
+}
 
 variable "workers" {
   description = "The number of nomad worker vms to create."
   default     = "3"
 }
+
+variable "zone_id" {
+  description = "The Zone ID which Holds the FQDN to which the subdomains will be added "
+}
+
+/*
+
+
+
 
 variable "region" {
   description = "The region to create resources."
@@ -50,21 +63,12 @@ variable "region" {
 }
 
 
-variable "zone_id" {
-  description = "The Zone ID which Holds the FQDN to which the subdomains will be added "
-}
 
 
 
 
 
 
-
-/////////////////////// SECURITY
-variable "host_access_ip" {
-  description = "list of CIDR blocks allowed to connect via SSH on port 22 e.g. your public ip format: [\"95.42.355.111/32\"]"
-  type        = list(string)
-}
 
 
 /////////////////////// COMPUTE
