@@ -1,7 +1,11 @@
 
+data "aws_vpc" "demostack" {
+  id = var.vpc_id
+}
+
 resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
-  vpc_id      = aws_vpc.demostack.id
+  vpc_id      = data.aws_vpc.demostack.id
   #Allow internal communication between nodes
   ingress {
     from_port = -1
