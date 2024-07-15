@@ -32,7 +32,7 @@ component "security" {
 
   inputs = {
     namespace = var.namespace
-    vpc_id = component.vpc.vpc_id
+    vpc_id = component.vpc.vpc.id
     host_access_ip = var.host_access_ip
     zone_id = var.zone_id
   }
