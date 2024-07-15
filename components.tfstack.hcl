@@ -34,11 +34,12 @@ component "security" {
     namespace = var.namespace
     vpc_id = component.vpc.vpc_id
     host_access_ip = var.host_access_ip
+    zone_id = var.zone_id
   }
 
   providers = {
     aws    = provider.aws.this
-    tls    = provider.tls.demostack
+    tls    = provider.tls.default
   }
 }
 
