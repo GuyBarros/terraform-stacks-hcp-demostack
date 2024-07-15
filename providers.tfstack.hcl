@@ -30,9 +30,8 @@ provider "aws" "this" {
 
   }
 
+}
+
 provider "tls" "default" {
 
   }
-
-
-}
