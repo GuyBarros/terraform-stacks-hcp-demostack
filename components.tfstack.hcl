@@ -2,17 +2,19 @@ component "vpc" {
   source = "./modules/aws/0_vpc"
 
   inputs = {
-   namespace = var.namespace
-   vpc_cidr_block = var.vpc_cidr_block
-   public_key = var.public_key
+    namespace      = var.namespace
+    vpc_cidr_block = var.vpc_cidr_block
+    public_key     = var.public_key
   }
 
   providers = {
-   aws    = provider.aws.this
+    aws = provider.aws.this
   }
 
 }
 
+
+/*
 component "networking" {
   source = "./modules/aws/1_networking"
 
@@ -43,7 +45,6 @@ component "security" {
   }
 }
 
-/*
 component "rds" {
   source = "./modules/aws/3_rds"
 
