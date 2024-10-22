@@ -2,7 +2,7 @@ variable "namespace" {
   description = <<EOH
 this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
 EOH
-type = string
+  type        = string
 }
 
 variable "region" {
@@ -10,7 +10,8 @@ variable "region" {
 }
 
 variable "identity_token_file" {
-  type = string
+  type      = string
+  ephemeral = true
 }
 
 variable "role_arn" {
@@ -20,12 +21,12 @@ variable "role_arn" {
 variable "vpc_cidr_block" {
   description = "The top-level CIDR block for the VPC."
   default     = "10.1.0.0/16"
-  type = string
+  type        = string
 }
 
 variable "public_key" {
   description = "The contents of the SSH public key to use for connecting to the cluster."
-  type = string
+  type        = string
 }
 
 
@@ -33,7 +34,7 @@ variable "public_key" {
 variable "cidr_blocks" {
   description = "The CIDR blocks to create the workstations in."
   default     = ["10.1.1.0/24", "10.1.2.0/24"]
-  type = list(string)
+  type        = list(string)
 }
 
 
@@ -46,12 +47,12 @@ variable "host_access_ip" {
 variable "workers" {
   description = "The number of nomad worker vms to create."
   default     = "3"
-  type = string
+  type        = string
 }
 
 variable "zone_id" {
   description = "The Zone ID which Holds the FQDN to which the subdomains will be added "
-  type = string
+  type        = string
 }
 
 /*
