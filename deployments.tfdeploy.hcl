@@ -7,9 +7,9 @@ identity_token "aws" {
 deployment "demostack" {
   inputs = {
     # providers
-    region              = "eu-west-2"
-    role_arn            = "arn:aws:iam::958215610051:role/tfc-wif-guybarros"
-    identity_token_file = identity_token.aws.jwt
+    region         = "eu-west-2"
+    role_arn       = "arn:aws:iam::958215610051:role/tfc-wif-guybarros"
+    identity_token = identity_token.aws.jwt
     # shared
     namespace = "guystack"
     # VPC

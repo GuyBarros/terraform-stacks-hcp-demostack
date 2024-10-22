@@ -9,7 +9,7 @@ variable "region" {
   type = string
 }
 
-variable "identity_token_file" {
+variable "identity_token" {
   type      = string
   ephemeral = true
 }
