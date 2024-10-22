@@ -25,6 +25,12 @@ variable "organization_id" {
   }
 }
 
+variable "organization_name" {
+  description = "Terraform Cloud organization ID, of the form org-abcdef"
+  type        = string
+  default = "GuyBarros"
+}
+
 variable "allowed_actions" {
   description = "List of IAM actions allowed for this role. For example, [\"s3:*\"]"
   type        = list(string)

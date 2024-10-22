@@ -1,14 +1,19 @@
 locals {
-  development_stack_subjects = ["organization:${var.organization_id}:*"]
+  development_stack_subjects = ["organization:${var.organization_name}:*"]
   jwt_audience               = "terraform-stacks-private-preview"
 }
+
+data "tls_certificate" "provider" {
+  url = "https://app.terraform.io"
+}
+
 
 # Terraform Cloud production OpenID provider.
 resource "aws_iam_openid_connect_provider" "stacks" {
   url = "https://app.terraform.io"
 
   client_id_list  = [local.jwt_audience]
-  thumbprint_list = ["9E99A48A9960B14926BB7F3B02E22DA2B0AB7280"]
+  thumbprint_list = [data.tls_certificate.provider.certificates[0].sha1_fingerprint]
 }
 
 # This role is assumed by Terraform Cloud dynamic credentials, accepting any
