@@ -51,9 +51,11 @@ component "rds" {
   source = "./modules/aws/3_rds"
 
   inputs = {
-    namespace   = var.namespace
-    vpc_id      = component.vpc.vpc_id
-    cidr_blocks = cidr_blocks
+    namespace              = var.namespace
+    vpc_id                 = component.vpc.vpc.id
+    cidr_blocks            = var.cidr_blocks
+    subnet_ids             = component.networking.subnet_ids
+    vpc_security_group_ids = component.security.vpc_security_group_id
   }
 
   providers = {

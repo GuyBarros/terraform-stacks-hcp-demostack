@@ -45,3 +45,15 @@ variable "documentdb_master__password" {
   description = "Password that will be used to create the AWS Postgres instance"
   default     = "YourPwdShouldBeLongAndSecure!"
 }
+
+variable "subnet_ids"{
+  description = "the list of subnet ids"
+  type = list(string)
+  default = [""]
+}
+
+variable "vpc_security_group_ids"{
+  description = "the security group id"
+  type = list(string)
+  default = [""]
+}

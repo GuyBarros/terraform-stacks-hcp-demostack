@@ -1,6 +1,7 @@
+
 resource "aws_db_subnet_group" "demostack" {
   name       = "${var.namespace}-databases"
-  subnet_ids  = aws_subnet.demostack.*.id
+  subnet_ids  = var.subnet_ids
 
 }
 
@@ -15,7 +16,7 @@ resource "aws_db_instance" "mysql" {
   password             = var.mysql_password
   parameter_group_name = "default.mysql5.7"
   db_subnet_group_name = aws_db_subnet_group.demostack.id
-  vpc_security_group_ids =[aws_security_group.demostack.id]
+  vpc_security_group_ids = var.vpc_security_group_ids
   skip_final_snapshot  = true
    timeouts {
     create = "10m"
@@ -38,7 +39,7 @@ username = var.postgres_username
 password = var.postgres_password
 port     = 5432
 db_subnet_group_name = aws_db_subnet_group.demostack.id
-vpc_security_group_ids =[aws_security_group.demostack.id]
+vpc_security_group_ids =var.vpc_security_group_ids
 skip_final_snapshot    = true
  timeouts {
     create = "10m"

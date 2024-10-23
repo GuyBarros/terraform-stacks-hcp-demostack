@@ -4,20 +4,16 @@ this is the differantiates different demostack deployment on the same subscripti
 EOH
   type        = string
 }
-
 variable "region" {
   type = string
 }
-
 variable "identity_token" {
   type      = string
   ephemeral = true
 }
-
 variable "role_arn" {
   type = string
 }
-
 variable "vpc_cidr_block" {
   description = "The top-level CIDR block for the VPC."
   default     = "10.1.0.0/16"
@@ -64,15 +60,6 @@ variable "region" {
   description = "The region to create resources."
   default     = "eu-west-2"
 }
-
-
-
-
-
-
-
-
-
 
 /////////////////////// COMPUTE
 variable "enterprise" {
