@@ -29,23 +29,24 @@ component "networking" {
   }
 }
 
-/*
+
 component "security" {
   source = "./modules/aws/2_security"
 
   inputs = {
-    namespace = var.namespace
-    vpc_id = component.vpc.vpc.id
+    namespace      = var.namespace
+    vpc_id         = component.vpc.vpc.id
     host_access_ip = var.host_access_ip
-    zone_id = var.zone_id
+    zone_id        = var.zone_id
   }
 
   providers = {
-    aws    = provider.aws.this
-    tls    = provider.tls.default
+    aws = provider.aws.this
+    tls = provider.tls.default
   }
 }
 
+/*
 component "rds" {
   source = "./modules/aws/3_rds"
 
