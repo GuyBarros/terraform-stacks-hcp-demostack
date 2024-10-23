@@ -14,21 +14,22 @@ component "vpc" {
 }
 
 
-/*
+
 component "networking" {
   source = "./modules/aws/1_networking"
 
   inputs = {
-    namespace = var.namespace
-    vpc_id = component.vpc.vpc.id
+    namespace   = var.namespace
+    vpc_id      = component.vpc.vpc.id
     cidr_blocks = var.cidr_blocks
   }
 
   providers = {
-    aws    = provider.aws.this
+    aws = provider.aws.this
   }
 }
 
+/*
 component "security" {
   source = "./modules/aws/2_security"
 
