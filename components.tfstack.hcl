@@ -46,21 +46,22 @@ component "security" {
   }
 }
 
-/*
+
 component "rds" {
   source = "./modules/aws/3_rds"
 
   inputs = {
-    namespace = var.namespace
-    vpc_id = component.vpc.vpc_id
+    namespace   = var.namespace
+    vpc_id      = component.vpc.vpc_id
     cidr_blocks = cidr_blocks
   }
 
   providers = {
-    aws    = provider.aws.this
+    aws = provider.aws.this
   }
 }
 
+/*
 component "compute" {
   source = "./modules/aws/4_compute"
 
