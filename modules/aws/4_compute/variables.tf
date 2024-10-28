@@ -44,3 +44,28 @@ variable "cni_plugin_url" {
   description = "The url to download teh CNI plugin for nomad."
   default     = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
 }
+
+variable "subnet_ids"{
+  description = "the list of subnet ids"
+  type = list(string)
+  default = [""]
+}
+
+variable "vpc_security_group_ids"{
+  description = "the security group id"
+  type = list(string)
+  default = [""]
+}
+
+variable "aws_iam_instance_profile_name" {
+  description = "the IAM instance profile name for compute instance"
+  type = string
+  default = ""
+}
+
+
+variable "aws_key_pair_id" {
+  description = "the AWS Key pair id that will be used for remote access to compute instances"
+  type = string
+  default = ""
+}

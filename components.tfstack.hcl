@@ -42,7 +42,7 @@ component "security" {
 
   providers = {
     aws = provider.aws.this
-    tls = provider.tls.default
+    tls = provider.tls.this
   }
 }
 
@@ -63,21 +63,29 @@ component "rds" {
   }
 }
 
-/*
+
 component "compute" {
   source = "./modules/aws/4_compute"
 
   inputs = {
-    namespace = var.namespace
-    vpc_id = component.vpc.vpc_id
-    cidr_blocks = cidr_blocks
+    namespace                     = var.namespace
+    vpc_id                        = component.vpc.vpc.id
+    subnet_ids                    = component.networking.subnet_ids
+    vpc_security_group_ids        = component.security.vpc_security_group_id
+    public_key                    = var.public_key
+    aws_iam_instance_profile_name = component.vpc.aws_iam_instance_profile_name
+    aws_key_pair_id               = component.vpc.aws_key_pair_id
   }
 
   providers = {
-    aws    = provider.aws.this
+    aws       = provider.aws.this
+    random    = provider.random.this
+    cloudinit = provider.cloudinit.this
+
   }
 }
 
+/*
 component "load_balancer" {
   source = "./modules/aws/5_loadbalancer"
 

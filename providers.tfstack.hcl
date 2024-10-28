@@ -16,6 +16,14 @@ required_providers {
     source  = "hashicorp/tls"
     version = "~> 4.0.5"
   }
+  random = {
+    source  = "hashicorp/random"
+    version = "~> 3.6.3"
+  }
+  cloudinit = {
+    source  = "hashicorp/cloudinit"
+    version = "~> 2.3.5"
+  }
 
 }
 
@@ -32,6 +40,17 @@ provider "aws" "this" {
 
 }
 
-provider "tls" "default" {
+provider "tls" "this" {
+
+}
+
+provider "cloudinit" "this" {
+
+
+}
+
+provider "random" "this" {
+
+
 
 }

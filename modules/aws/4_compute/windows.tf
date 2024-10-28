@@ -20,11 +20,11 @@ resource "aws_instance" "windows" {
 
   ami           = data.aws_ami.windows.id
   instance_type = var.instance_type_worker
-  key_name      = aws_key_pair.demostack.id
+  key_name      = var.aws_key_pair_id
 
-  subnet_id              = aws_subnet.demostack.0.id
-  iam_instance_profile   = aws_iam_instance_profile.consul-join.name
-  vpc_security_group_ids = [aws_security_group.demostack.id]
+  subnet_id              = var.subnet_ids[0]
+  iam_instance_profile   = var.aws_iam_instance_profile_name
+  vpc_security_group_ids = var.vpc_security_group_ids
 
 
   root_block_device {
