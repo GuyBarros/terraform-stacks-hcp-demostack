@@ -65,15 +65,15 @@ resource "aws_alb_listener" "traefik-ui" {
 }
 
 resource "aws_alb_target_group_attachment" "traefik" {
-  count            = var.workers
+  for_each        = toset(data.aws_instances.workers.ids)
   target_group_arn = aws_alb_target_group.traefik.arn
-  target_id        = element(var.aws_instance_workers_ids[*], count.index)
+  target_id        = each.key
   port             = "8080"
 }
 
 resource "aws_alb_target_group_attachment" "traefik-ui" {
-  count            = var.workers
+  for_each        = toset(data.aws_instances.workers.ids)
   target_group_arn = aws_alb_target_group.traefik-ui.arn
-  target_id        = element(var.aws_instance_workers_ids[*], count.index)
+  target_id        = each.key
   port             = "8081"
 }

@@ -64,17 +64,17 @@ resource "aws_alb_listener" "fabio-ui" {
 }
 
 resource "aws_alb_target_group_attachment" "fabio" {
-  count            = var.workers
+  for_each        = toset(data.aws_instances.workers.ids)
   target_group_arn = aws_alb_target_group.fabio.arn
-  target_id        = element(var.aws_instance_workers_ids[*], count.index)
+  target_id        = each.key
   port             = "9999"
 
 }
 
 resource "aws_alb_target_group_attachment" "fabio-ui" {
-  count            = var.workers
+  for_each        = toset(data.aws_instances.workers.ids)
   target_group_arn = aws_alb_target_group.fabio-ui.arn
-  target_id        = element(var.aws_instance_workers_ids[*], count.index)
+  target_id        = each.key
   port             = "9998"
 
 }

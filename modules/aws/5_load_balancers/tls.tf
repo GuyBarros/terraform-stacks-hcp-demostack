@@ -12,8 +12,8 @@ resource "tls_private_key" "root" {
 
 # Root certificate
 resource "tls_self_signed_cert" "root" {
-    private_key_pem = tls_private_key.root.private_key_pem
-  
+  private_key_pem = tls_private_key.root.private_key_pem
+
   subject {
     common_name  = var.namespace
     organization = "HashiCorp Demostack"
@@ -122,14 +122,14 @@ resource "aws_route53_record" "validation_record" {
 
 
 
-/*
-resource "aws_acm_certificate_validation" "cert" {
-  certificate_arn = aws_acm_certificate.cert.arn
-   validation_record_fqdns = [
-    aws_route53_record.validation_record.fqdn,
-  ]
-}
-*/
+
+# resource "aws_acm_certificate_validation" "cert" {
+#   certificate_arn = aws_acm_certificate.cert.arn
+#   validation_record_fqdns = [
+#     aws_route53_record.validation_record.fqdn,
+#   ]
+# }
+
 
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn         = aws_acm_certificate.cert.arn

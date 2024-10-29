@@ -19,9 +19,9 @@ resource "aws_alb_target_group" "waypoint" {
 
 }
 resource "aws_alb_target_group_attachment" "waypoint" {
-  count            = var.workers
+  for_each        = toset(data.aws_instances.workers.ids)
   target_group_arn = aws_alb_target_group.waypoint.arn
-  target_id        = element(var.aws_instance_workers_ids[*], count.index)
+  target_id        = each.key
   port             = 9701
 }
 
@@ -55,9 +55,9 @@ resource "aws_alb_target_group" "waypoint-ui" {
 
 }
 resource "aws_alb_target_group_attachment" "waypoint-ui" {
-  count            = var.workers
+  for_each        = toset(data.aws_instances.workers.ids)
   target_group_arn = aws_alb_target_group.waypoint-ui.arn
-  target_id        = element(var.aws_instance_workers_ids[*], count.index)
+  target_id        = each.key
   port             = 9702
 }
 

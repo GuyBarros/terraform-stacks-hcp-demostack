@@ -42,7 +42,6 @@ component "security" {
 
   providers = {
     aws = provider.aws.this
-    tls = provider.tls.this
   }
 }
 
@@ -88,25 +87,22 @@ component "compute" {
 }
 
 
-# component "load_balancer" {
-#   source = "./modules/aws/5_load_balancers"
+component "load_balancer" {
+  source = "./modules/aws/5_load_balancers"
 
-#   inputs = {
-#     namespace                       = var.namespace
-#     vpc_id                          = component.vpc.vpc.id
-#     subnet_ids                      = component.networking.subnet_ids
-#     vpc_security_group_ids          = component.security.vpc_security_group_id
-#     zone_id                         = var.zone_id
-#     vpc_id                          = component.vpc.vpc.id
-#     aws_instance_workers_ids        = component.compute.aws_instance_workers_ids
-#     aws_instance_workers_public_dns = component.compute.aws_instance_workers_public_dns
-#     workers                         = var.workers
-#     certificate_arn                 = component.security.certificate_arn
-#     validation_certificate          = component.security.validation_certificate
-#   }
+  inputs = {
+    namespace              = var.namespace
+    vpc_id                 = component.vpc.vpc.id
+    subnet_ids             = component.networking.subnet_ids
+    vpc_security_group_ids = component.security.vpc_security_group_id
+    zone_id                = var.zone_id
+    vpc_id                 = component.vpc.vpc.id
+    workers                = var.workers
+  }
 
-#   providers = {
-#     aws = provider.aws.this
-#   }
-# }
+  providers = {
+    aws = provider.aws.this
+    tls = provider.tls.this
+  }
+}
 

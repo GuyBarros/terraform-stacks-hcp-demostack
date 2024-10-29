@@ -30,26 +30,9 @@ variable "vpc_security_group_ids"{
   default = [""]
 }
 
-variable "aws_instance_workers_ids"{
-  description = "The list of compute ids we will use for the load balancers"
-  type = list(string)
-  default = [""]
-}
 
-variable "aws_instance_workers_public_dns" {
-  description = "The list of public dns from our compute workers we will use for the DNS"
-  type = list(string)
-  default = [""]
-}
-
-variable "certificate_arn" {
-  description = "Arn of the validation certificate"
+variable "region" {
+  description = "The region to create resources."
+  default     = "eu-west-2"
   type = string
-  default = ""
-}
-
-variable "validation_certificate" {
-  description = "Validation certificate cert"
-  type = string
-  default = ""
 }
