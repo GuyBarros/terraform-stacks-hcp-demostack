@@ -1,15 +1,15 @@
 resource "aws_alb" "traefik" {
   name = "${var.namespace}-traefik"
 
-  security_groups = [aws_security_group.demostack.id]
-  subnets         = aws_subnet.demostack.*.id
+  security_groups = var.vpc_security_group_ids
+  subnets         = var.subnet_ids
 
 }
 
 resource "aws_alb_target_group" "traefik" {
   name     = "${var.namespace}-traefik"
   port     = "8080"
-  vpc_id   = aws_vpc.demostack.id
+  vpc_id      = data.aws_vpc.demostack.id
   protocol = "HTTP"
 
   health_check {
@@ -26,7 +26,7 @@ resource "aws_alb_target_group" "traefik" {
 resource "aws_alb_target_group" "traefik-ui" {
   name     = "${var.namespace}-traefik-ui"
   port     = "8081"
-  vpc_id   = aws_vpc.demostack.id
+  vpc_id      = data.aws_vpc.demostack.id
   protocol = "HTTP"
 
   health_check {
@@ -67,13 +67,13 @@ resource "aws_alb_listener" "traefik-ui" {
 resource "aws_alb_target_group_attachment" "traefik" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.traefik.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = element(var.aws_instance_workers_ids[*], count.index)
   port             = "8080"
 }
 
 resource "aws_alb_target_group_attachment" "traefik-ui" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.traefik-ui.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = element(var.aws_instance_workers_ids[*], count.index)
   port             = "8081"
 }

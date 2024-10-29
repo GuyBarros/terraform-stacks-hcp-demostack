@@ -75,6 +75,7 @@ component "compute" {
     public_key                    = var.public_key
     aws_iam_instance_profile_name = component.vpc.aws_iam_instance_profile_name
     aws_key_pair_id               = component.vpc.aws_key_pair_id
+    workers                       = var.workers
   }
 
   providers = {
@@ -83,20 +84,29 @@ component "compute" {
     cloudinit = provider.cloudinit.this
 
   }
+
 }
 
-/*
+
 component "load_balancer" {
-  source = "./modules/aws/5_loadbalancer"
+  source = "./modules/aws/5_load_balancers"
 
   inputs = {
-    namespace = var.namespace
-    vpc_id = component.vpc.vpc_id
-    cidr_blocks = cidr_blocks
+    namespace                       = var.namespace
+    vpc_id                          = component.vpc.vpc.id
+    subnet_ids                      = component.networking.subnet_ids
+    vpc_security_group_ids          = component.security.vpc_security_group_id
+    zone_id                         = var.zone_id
+    vpc_id                          = component.vpc.vpc.id
+    aws_instance_workers_ids        = component.compute.aws_instance_workers_ids
+    aws_instance_workers_public_dns = component.compute.aws_instance_workers_public_dns
+    workers                         = var.workers
+    certificate_arn                 = component.security.certificate_arn
+    validation_certificate          = component.security.validation_certificate
   }
 
   providers = {
-    aws    = provider.aws.this
+    aws = provider.aws.this
   }
 }
-*/
+

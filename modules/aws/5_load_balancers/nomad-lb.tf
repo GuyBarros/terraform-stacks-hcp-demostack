@@ -1,8 +1,8 @@
 resource "aws_alb" "nomad" {
   name = "${var.namespace}-nomad"
 
-  security_groups = [aws_security_group.demostack.id]
-  subnets         = aws_subnet.demostack.*.id
+  security_groups = var.vpc_security_group_ids
+  subnets         = var.subnet_ids
 
 }
 
@@ -10,7 +10,7 @@ resource "aws_alb_target_group" "nomad" {
   name = "${var.namespace}-nomad"
 
   port     = "4646"
-  vpc_id   = aws_vpc.demostack.id
+  vpc_id      = data.aws_vpc.demostack.id
   protocol = "HTTPS"
 
   health_check {
@@ -25,15 +25,12 @@ resource "aws_alb_target_group" "nomad" {
 }
 
 resource "aws_alb_listener" "nomad" {
-  depends_on = [
-    aws_acm_certificate_validation.cert
-  ]
-
+  
   load_balancer_arn = aws_alb.nomad.arn
 
   port            = "4646"
   protocol        = "HTTPS"
-  certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
+  certificate_arn = var.certificate_arn
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
 
   default_action {
@@ -45,7 +42,7 @@ resource "aws_alb_listener" "nomad" {
 resource "aws_alb_target_group_attachment" "nomad" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.nomad.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = element(var.aws_instance_workers_ids[*], count.index)
   port             = "4646"
 
 }
