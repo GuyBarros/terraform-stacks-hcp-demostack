@@ -41,9 +41,9 @@ resource "aws_route53_record" "nomad" {
 resource "aws_route53_record" "workers" {
   for_each        = toset(data.aws_instances.workers.public_ips)
   zone_id = var.zone_id
-  name    = "workers-${each.value}.${var.namespace}"
+  name    = "workers-${each.key}.${var.namespace}"
   type    = "CNAME"
-  records = [each.key]
+  records = [each.value]
   ttl     = "300"
 
 
