@@ -41,4 +41,10 @@ resource "aws_instance" "windows" {
 
 get_password_data = true
   user_data = base64encode(file("${path.module}/templates/windows/init.ps1"))
+
+   tags = {
+    Purpose  = var.namespace,
+    Function = "Windows",
+    Name     = "demostack-windows", #"
+  }
 }
