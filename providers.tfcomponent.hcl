@@ -1,16 +1,11 @@
+# providers.tfcomponent.hcl
+# Declares all provider requirements and configurations for the stack.
+# AWS uses OIDC workload identity (web_identity) — no static keys needed.
 
 required_providers {
-  hcp = {
-    source  = "hashicorp/hcp"
-    version = "0.92.0"
-  }
   aws = {
     source  = "hashicorp/aws"
     version = "~> 5.55"
-  }
-  local = {
-    source  = "hashicorp/local"
-    version = "~> 2.5.1"
   }
   tls = {
     source  = "hashicorp/tls"
@@ -24,8 +19,11 @@ required_providers {
     source  = "hashicorp/cloudinit"
     version = "~> 2.3.5"
   }
-
 }
+
+# ---------------------------------------------------------------------------
+# AWS provider — region and OIDC role are injected per-deployment
+# ---------------------------------------------------------------------------
 
 provider "aws" "this" {
   config {
@@ -35,22 +33,11 @@ provider "aws" "this" {
       role_arn           = var.role_arn
       web_identity_token = var.identity_token
     }
-
   }
-
 }
 
-provider "tls" "this" {
+provider "tls" "this" {}
 
-}
+provider "cloudinit" "this" {}
 
-provider "cloudinit" "this" {
-
-
-}
-
-provider "random" "this" {
-
-
-
-}
+provider "random" "this" {}

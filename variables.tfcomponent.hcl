@@ -1,91 +1,113 @@
-variable "namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-  type        = string
-}
-variable "region" {
-  type = string
-}
+# variables.tfcomponent.hcl
+# All input variables available to every component in the stack.
+# Values are supplied per-deployment in deployments.tfdeploy.hcl.
+
+# ---------------------------------------------------------------------------
+# Authentication (OIDC workload identity)
+# ---------------------------------------------------------------------------
+
 variable "identity_token" {
-  type      = string
-  ephemeral = true
+  type        = string
+  ephemeral   = true
+  description = "OIDC identity token issued by HCP Terraform for AWS assume-role."
 }
+
 variable "role_arn" {
-  type = string
+  type        = string
+  description = "ARN of the IAM role to assume via web identity."
 }
+
+# ---------------------------------------------------------------------------
+# Topology
+# ---------------------------------------------------------------------------
+
+variable "region" {
+  type        = string
+  description = "AWS region for this deployment (e.g. eu-west-2)."
+}
+
+variable "namespace" {
+  type        = string
+  description = "Unique name that differentiates deployments on the same account."
+}
+
+# ---------------------------------------------------------------------------
+# Networking
+# ---------------------------------------------------------------------------
+
 variable "vpc_cidr_block" {
-  description = "The top-level CIDR block for the VPC."
+  type        = string
+  description = "Top-level CIDR block for the VPC."
   default     = "10.1.0.0/16"
-  type        = string
 }
 
-variable "public_key" {
-  description = "The contents of the SSH public key to use for connecting to the cluster."
-  type        = string
-}
-
-
-//////////////////////// NETWORKING
 variable "cidr_blocks" {
-  description = "The CIDR blocks to create the workstations in."
-  default     = ["10.1.1.0/24", "10.1.2.0/24"]
   type        = list(string)
-}
-
-
-/////////////////////// SECURITY
-variable "host_access_ip" {
-  description = "list of CIDR blocks allowed to connect via SSH on port 22 e.g. your public ip format: [\"95.42.355.111/32\"]"
-  type        = list(string)
-}
-
-variable "workers" {
-  description = "The number of nomad worker vms to create."
-  default     = "3"
-  type        = string
+  description = "Subnet CIDR blocks to create inside the VPC."
+  default     = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
 }
 
 variable "zone_id" {
-  description = "The Zone ID which Holds the FQDN to which the subdomains will be added "
   type        = string
+  description = "Route 53 hosted zone ID for DNS records and ACM validation."
 }
 
-/*
+# ---------------------------------------------------------------------------
+# Access
+# ---------------------------------------------------------------------------
 
-
-
-
-variable "region" {
-  description = "The region to create resources."
-  default     = "eu-west-2"
+variable "public_key" {
+  type        = string
+  description = "SSH public key content — used to create an AWS key pair."
 }
 
-/////////////////////// COMPUTE
-variable "enterprise" {
-  description = "do you want to use the enterprise version of Nomad"
-  default     = false
+variable "host_access_ip" {
+  type        = list(string)
+  description = "CIDR blocks permitted SSH access (e.g. [\"1.2.3.4/32\"])."
+  default     = []
 }
 
-variable "nomadlicense" {
-  description = "Enterprise License for Nomad"
-  default     = ""
-}
+# ---------------------------------------------------------------------------
+# Compute
+# ---------------------------------------------------------------------------
 
+variable "workers" {
+  type        = string
+  description = "Number of Nomad worker EC2 instances."
+  default     = "3"
+}
 
 variable "instance_type_worker" {
-  description = "The type(size) of data workers (consul, nomad, etc)."
+  type        = string
+  description = "EC2 instance type for worker nodes."
   default     = "t3.medium"
 }
 
 variable "run_nomad_jobs" {
-  default = "0"
+  type        = string
+  description = "Set to 1 to automatically submit example Nomad jobs at boot."
+  default     = "0"
 }
 
-
 variable "cni_plugin_url" {
-  description = "The url to download teh CNI plugin for nomad."
+  type        = string
+  description = "Download URL for the CNI plugins tarball used by Nomad."
   default     = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
 }
 
-*/
+# ---------------------------------------------------------------------------
+# Enterprise licensing
+# ---------------------------------------------------------------------------
+
+variable "enterprise" {
+  type        = bool
+  description = "Set to true to install enterprise binaries."
+  default     = false
+}
+
+variable "nomadlicense" {
+  type        = string
+  sensitive   = true
+  description = "Nomad Enterprise licence string."
+  default     = ""
+}

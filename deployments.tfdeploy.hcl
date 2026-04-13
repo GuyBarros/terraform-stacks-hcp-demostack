@@ -1,95 +1,95 @@
 # deployments.tfdeploy.hcl
-# Defines the deployment targets for the demostack stack.
-# Each deployment maps to one context (set of variable values) and
-# controls orchestration (e.g. whether clusters are applied in parallel or sequentially).
-
-# ---------------------------------------------------------------------------
-# Identity token for HCP Terraform workload identity (OIDC)
-# Remove / adjust if you use static AWS credentials instead.
-# ---------------------------------------------------------------------------
+# Defines one deployment per region. Each supplies region-specific inputs
+# and OIDC credentials. Adjust role_arn values to match your AWS account.
 
 identity_token "aws" {
   audience = ["aws.workload.identity"]
 }
 
 # ---------------------------------------------------------------------------
-# Deployment: primary  (eu-west-2)
-# The primary cluster is applied first; secondary & tertiary depend on it
-# so that the primary datacenter value is available for mesh gateway config.
+# Primary — eu-west-2 (London)
 # ---------------------------------------------------------------------------
 
 deployment "primary" {
   inputs = {
-    # Deployment-level AWS credential wiring (OIDC / workload identity)
-    # Replace with var references to HCP Terraform variable sets as needed.
-    owner      = "your-iam-user"
-    public_key = "<your-ssh-public-key>"
-    se_region  = "EMEA"
-    purpose    = "Hashistack Demo"
-    name       = "demostack"
+    region    = "eu-west-2"
+    namespace = "primarystack"
 
-    servers = 3
-    workers = 3
+    identity_token = identity_token.aws.jwt
+    role_arn       = "arn:aws:iam::YOUR_ACCOUNT_ID:role/YOUR_TFC_ROLE"
 
-    enterprise    = false
-    vaultlicense  = ""
-    consullicense = ""
-    nomadlicense  = ""
+    public_key     = "ssh-rsa AAAA... your-key-here"
+    host_access_ip = ["YOUR_IP/32"]
+    zone_id        = "YOUR_ROUTE53_ZONE_ID"
 
-    TTL            = "240"
-    sleep_at_night = true
-    created_by     = "Terraform Stacks"
+    vpc_cidr_block = "10.1.0.0/16"
+    cidr_blocks    = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
+
+    workers              = "3"
+    instance_type_worker = "t3.medium"
+    run_nomad_jobs       = "0"
+    cni_plugin_url       = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
+
+    enterprise   = false
+    nomadlicense = ""
   }
 }
 
 # ---------------------------------------------------------------------------
-# Deployment: secondary  (eu-east-1)
+# Secondary — eu-central-1 (Frankfurt)
+# NOTE: eu-east-1 does not exist; using eu-central-1 instead.
 # ---------------------------------------------------------------------------
 
 deployment "secondary" {
   inputs = {
-    owner      = "your-iam-user"
-    public_key = "<your-ssh-public-key>"
-    se_region  = "EMEA"
-    purpose    = "Hashistack Demo"
-    name       = "demostack"
+    region    = "eu-central-1"
+    namespace = "secondarystack"
 
-    servers = 3
-    workers = 3
+    identity_token = identity_token.aws.jwt
+    role_arn       = "arn:aws:iam::YOUR_ACCOUNT_ID:role/YOUR_TFC_ROLE"
 
-    enterprise    = false
-    vaultlicense  = ""
-    consullicense = ""
-    nomadlicense  = ""
+    public_key     = "ssh-rsa AAAA... your-key-here"
+    host_access_ip = ["YOUR_IP/32"]
+    zone_id        = "YOUR_ROUTE53_ZONE_ID"
 
-    TTL            = "240"
-    sleep_at_night = true
-    created_by     = "Terraform Stacks"
+    vpc_cidr_block = "10.2.0.0/16"
+    cidr_blocks    = ["10.2.1.0/24", "10.2.2.0/24", "10.2.3.0/24"]
+
+    workers              = "3"
+    instance_type_worker = "t3.medium"
+    run_nomad_jobs       = "0"
+    cni_plugin_url       = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
+
+    enterprise   = false
+    nomadlicense = ""
   }
 }
 
 # ---------------------------------------------------------------------------
-# Deployment: tertiary  (ap-northeast-1)
+# Tertiary — ap-northeast-1 (Tokyo)
 # ---------------------------------------------------------------------------
 
 deployment "tertiary" {
   inputs = {
-    owner      = "your-iam-user"
-    public_key = "<your-ssh-public-key>"
-    se_region  = "APAC"
-    purpose    = "Hashistack Demo"
-    name       = "demostack"
+    region    = "ap-northeast-1"
+    namespace = "tertiarystack"
 
-    servers = 3
-    workers = 3
+    identity_token = identity_token.aws.jwt
+    role_arn       = "arn:aws:iam::YOUR_ACCOUNT_ID:role/YOUR_TFC_ROLE"
 
-    enterprise    = false
-    vaultlicense  = ""
-    consullicense = ""
-    nomadlicense  = ""
+    public_key     = "ssh-rsa AAAA... your-key-here"
+    host_access_ip = ["YOUR_IP/32"]
+    zone_id        = "YOUR_ROUTE53_ZONE_ID"
 
-    TTL            = "240"
-    sleep_at_night = true
-    created_by     = "Terraform Stacks"
+    vpc_cidr_block = "10.3.0.0/16"
+    cidr_blocks    = ["10.3.1.0/24", "10.3.2.0/24", "10.3.3.0/24"]
+
+    workers              = "3"
+    instance_type_worker = "t3.medium"
+    run_nomad_jobs       = "0"
+    cni_plugin_url       = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
+
+    enterprise   = false
+    nomadlicense = ""
   }
 }
