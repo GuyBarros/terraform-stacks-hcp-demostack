@@ -33,6 +33,7 @@ deployment "primary" {
     enterprise   = false
     nomadlicense = ""
   }
+  destroy = true
 }
 
 # ---------------------------------------------------------------------------
