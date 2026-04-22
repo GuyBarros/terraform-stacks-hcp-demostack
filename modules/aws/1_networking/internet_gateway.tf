@@ -22,6 +22,16 @@ resource "aws_route" "internet_access" {
   gateway_id             = aws_internet_gateway.demostack.id
 }
 
+# Route traffic destined for the HVN CIDR through the VPC peering connection.
+# Without this, EC2 instances cannot reach HCP Vault's private endpoint.
+resource "aws_route" "hvn_peering" {
+  count = var.hvn_cidr != "" && var.vpc_peering_connection_id != "" ? 1 : 0
+
+  route_table_id            = data.aws_vpc.demostack.main_route_table_id
+  destination_cidr_block    = var.hvn_cidr
+  vpc_peering_connection_id = var.vpc_peering_connection_id
+}
+
 resource "aws_subnet" "demostack" {
   count                   = length(var.cidr_blocks)
   vpc_id                  = data.aws_vpc.demostack.id

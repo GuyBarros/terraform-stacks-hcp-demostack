@@ -24,9 +24,11 @@ component "networking" {
   source = "./modules/aws/1_networking"
 
   inputs = {
-    namespace   = var.namespace
-    vpc_id      = component.vpc.vpc.id
-    cidr_blocks = var.cidr_blocks
+    namespace                 = var.namespace
+    vpc_id                    = component.vpc.vpc.id
+    cidr_blocks               = var.cidr_blocks
+    hvn_cidr                  = component.hcp_clusters.hvn_cidr
+    vpc_peering_connection_id = component.hcp_clusters.vpc_peering_connection_id
   }
 
   providers = {

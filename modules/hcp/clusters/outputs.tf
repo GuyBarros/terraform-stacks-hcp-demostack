@@ -18,3 +18,13 @@ output "boundary_cluster_url" {
   description = "HCP Boundary cluster URL."
   value       = hcp_boundary_cluster.demostack.cluster_url
 }
+
+output "vpc_peering_connection_id" {
+  description = "AWS VPC peering connection ID — needed to add a route in the VPC route table."
+  value       = hcp_aws_network_peering.demostack_peering.provider_peering_id
+}
+
+output "hvn_cidr" {
+  description = "HVN CIDR block — the destination for the VPC route to HCP."
+  value       = hcp_hvn.demostack.cidr_block
+}
