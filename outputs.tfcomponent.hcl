@@ -9,7 +9,6 @@
 
 output "workers" {
   description = "FQDN of each worker node (Route 53 records)."
-  type        = map(any)
   value       = component.load_balancer.workers
 }
 
