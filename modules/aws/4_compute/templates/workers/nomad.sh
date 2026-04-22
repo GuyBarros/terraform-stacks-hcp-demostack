@@ -72,15 +72,6 @@ tls {
   key_file  = "/etc/ssl/certs/me.key"
   verify_server_hostname = false
 }
-consul {
-    server_service_name = "nomad-server"
-    client_service_name = "nomad-client"
-    auto_advertise = true
-    server_auto_join = true
-    client_auto_join = true
-    ca_file = "/etc/consul.d/ca.pem"
-    token = "${hcp_acl_token}"
-}
 vault {
   enabled          = true
   address          = "${VAULT_ADDR}"
@@ -107,7 +98,7 @@ sudo tee /etc/profile.d/nomad.sh > /dev/null <<"EOF"
 alias noamd="nomad"
 alias nomas="nomad"
 alias nomda="nomad"
-export NOMAD_ADDR="https://${node_name}.node.consul:4646"
+export NOMAD_ADDR="https://localhost:4646"
 export NOMAD_CACERT="/usr/local/share/ca-certificates/01-me.crt"
 export NOMAD_CLIENT_CERT="/etc/ssl/certs/me.crt"
 export NOMAD_CLIENT_KEY="/etc/ssl/certs/me.key"

@@ -1,6 +1,6 @@
 variable "namespace" {
   type        = string
-  description = "Unique deployment identifier used as cluster IDs and resource names."
+  description = "Unique deployment identifier."
 }
 
 variable "region" {
@@ -23,16 +23,6 @@ variable "vpc_cidr_block" {
 variable "hcp_vault_cluster_tier" {
   type    = string
   default = "dev"
-}
-
-variable "hcp_consul_cluster_tier" {
-  type    = string
-  default = "development"
-}
-
-variable "hcp_consul_cluster_size" {
-  type    = string
-  default = "x_small"
 }
 
 variable "hcp_boundary_cluster_tier" {

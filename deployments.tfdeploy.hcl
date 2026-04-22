@@ -4,19 +4,13 @@ identity_token "aws" {
   audience = ["aws.workload.identity"]
 }
 
-# ---------------------------------------------------------------------------
-# Pull HCP Service Principal credentials from an HCP Terraform variable set.
-# 
-# Setup steps:
-#   1. HCP Terraform → Settings → Variable Sets → New Variable Set
-#   2. Add variable: hcp_client_id        (Terraform, plain text)
-#   3. Add variable: hcp_client_secret    (Terraform, sensitive)
-#   4. Name the set "hcp_credentials" (or update the name below)
-#   5. Assign it to your project or make it global
-# ---------------------------------------------------------------------------
+# Pull HCP Service Principal credentials from a variable set.
+# Setup: HCP Terraform → Settings → Variable Sets → New Variable Set
+#   Add: hcp_client_id (Terraform, plain), hcp_client_secret (Terraform, sensitive)
+#   Then paste the variable set ID below.
 
 store "varset" "hcp_credentials" {
-  id       = "varset-onaF4oTg6YsQj69W"
+  id       = "varset-REPLACE_WITH_YOUR_VARSET_ID"
   category = "terraform"
 }
 
@@ -25,11 +19,9 @@ deployment "primary" {
     region    = "eu-west-2"
     namespace = "primarystack"
 
-    # AWS OIDC
     identity_token = identity_token.aws.jwt
     role_arn       = "arn:aws:iam::958215610051:role/tfc_stacks_test"
 
-    # HCP credentials pulled from variable set — no secrets in code
     hcp_client_id     = store.varset.hcp_credentials.hcp_client_id
     hcp_client_secret = store.varset.hcp_credentials.hcp_client_secret
 
@@ -47,11 +39,8 @@ deployment "primary" {
 
     enterprise   = false
     nomadlicense = ""
-   # nomadlicense = store.varset.hcp_credentials.nomad_ent_license
 
     hcp_vault_cluster_tier    = "dev"
-    hcp_consul_cluster_tier   = "development"
-    hcp_consul_cluster_size   = "x_small"
     hcp_boundary_cluster_tier = "standard"
   }
   destroy = false

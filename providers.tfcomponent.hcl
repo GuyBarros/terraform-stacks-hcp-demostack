@@ -9,14 +9,6 @@ required_providers {
     source  = "hashicorp/hcp"
     version = "~> 0.92"
   }
-  consul = {
-    source  = "hashicorp/consul"
-    version = "~> 2.20"
-  }
-  time = {
-    source  = "hashicorp/time"
-    version = "~> 0.11"
-  }
   tls = {
     source  = "hashicorp/tls"
     version = "~> 4.0.5"
@@ -31,10 +23,6 @@ required_providers {
   }
 }
 
-# ---------------------------------------------------------------------------
-# AWS — OIDC workload identity
-# ---------------------------------------------------------------------------
-
 provider "aws" "this" {
   config {
     region = var.region
@@ -46,10 +34,6 @@ provider "aws" "this" {
   }
 }
 
-# ---------------------------------------------------------------------------
-# HCP — Service Principal credentials from deployment inputs
-# ---------------------------------------------------------------------------
-
 provider "hcp" "this" {
   config {
     client_id     = var.hcp_client_id
@@ -57,20 +41,6 @@ provider "hcp" "this" {
   }
 }
 
-# ---------------------------------------------------------------------------
-# Consul — configured using hcp_clusters component outputs.
-# The hcp_config component uses this provider to create ACL resources.
-# ---------------------------------------------------------------------------
-
-provider "consul" "this" {
-  config {
-    address    = component.hcp_clusters.consul_public_endpoint
-    datacenter = component.hcp_clusters.consul_datacenter
-    token      = component.hcp_clusters.consul_root_token
-  }
-}
-
-provider "time" "this" {}
 provider "tls" "this" {}
 provider "cloudinit" "this" {}
 provider "random" "this" {}

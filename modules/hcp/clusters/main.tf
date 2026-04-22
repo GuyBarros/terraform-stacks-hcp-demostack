@@ -1,8 +1,6 @@
 # modules/hcp/clusters/main.tf
-# Creates all HCP clusters and the HVN↔VPC peering.
-# Uses only the hcp and aws providers — no consul provider needed here.
-# Outputs cluster endpoints so the stack-level consul provider can be configured,
-# and the hcp/config module can create ACL resources.
+# Creates HCP Vault, Boundary, and the HVN↔VPC peering.
+# HCP Consul has been removed — Nomad uses its native service discovery.
 
 locals {
   common_tags = {
@@ -64,30 +62,6 @@ resource "hcp_vault_cluster" "demostack" {
 
 resource "hcp_vault_cluster_admin_token" "root" {
   cluster_id = hcp_vault_cluster.demostack.cluster_id
-}
-
-# ---------------------------------------------------------------------------
-# HCP Consul
-# ---------------------------------------------------------------------------
-
-resource "hcp_consul_cluster" "demostack" {
-  hvn_id          = hcp_hvn.demostack.hvn_id
-  cluster_id      = "${var.namespace}-consul"
-  tier            = var.hcp_consul_cluster_tier
-  size            = var.hcp_consul_cluster_size
-  datacenter      = var.region
-  public_endpoint = true
-}
-
-# Wait for cluster to stabilise before config module creates ACL resources
-resource "time_sleep" "wait_for_consul" {
-  depends_on      = [hcp_consul_cluster.demostack]
-  create_duration = "30s"
-}
-
-resource "hcp_consul_cluster_root_token" "root" {
-  depends_on = [time_sleep.wait_for_consul]
-  cluster_id = hcp_consul_cluster.demostack.cluster_id
 }
 
 # ---------------------------------------------------------------------------

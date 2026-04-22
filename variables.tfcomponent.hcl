@@ -1,54 +1,32 @@
 # variables.tfcomponent.hcl
 
-# ---------------------------------------------------------------------------
-# Authentication — AWS OIDC
-# ---------------------------------------------------------------------------
-
 variable "identity_token" {
-  type        = string
-  ephemeral   = true
-  description = "OIDC identity token issued by HCP Terraform for AWS assume-role."
+  type      = string
+  ephemeral = true
 }
 
 variable "role_arn" {
-  type        = string
-  description = "ARN of the IAM role to assume via web identity."
+  type = string
 }
 
-# ---------------------------------------------------------------------------
-# Authentication — HCP Service Principal
-# ---------------------------------------------------------------------------
-
 variable "hcp_client_id" {
-  type        = string
-  ephemeral   = true
-  description = "HCP Service Principal client ID."
+  type      = string
+  ephemeral = true
 }
 
 variable "hcp_client_secret" {
-  type        = string
-  ephemeral   = true
-  sensitive   = true
-  description = "HCP Service Principal client secret."
+  type      = string
+  ephemeral = true
+  sensitive = true
 }
 
-# ---------------------------------------------------------------------------
-# Topology
-# ---------------------------------------------------------------------------
-
 variable "region" {
-  type        = string
-  description = "AWS region for this deployment."
+  type = string
 }
 
 variable "namespace" {
-  type        = string
-  description = "Unique name differentiating deployments on the same account."
+  type = string
 }
-
-# ---------------------------------------------------------------------------
-# Networking
-# ---------------------------------------------------------------------------
 
 variable "vpc_cidr_block" {
   type    = string
@@ -61,27 +39,17 @@ variable "cidr_blocks" {
 }
 
 variable "zone_id" {
-  type        = string
-  description = "Route 53 hosted zone ID for DNS records and ACM validation."
+  type = string
 }
 
-# ---------------------------------------------------------------------------
-# Access
-# ---------------------------------------------------------------------------
-
 variable "public_key" {
-  type        = string
-  description = "SSH public key content for the AWS key pair."
+  type = string
 }
 
 variable "host_access_ip" {
   type    = list(string)
   default = []
 }
-
-# ---------------------------------------------------------------------------
-# Compute
-# ---------------------------------------------------------------------------
 
 variable "workers" {
   type    = string
@@ -103,10 +71,6 @@ variable "cni_plugin_url" {
   default = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
 }
 
-# ---------------------------------------------------------------------------
-# Enterprise licensing
-# ---------------------------------------------------------------------------
-
 variable "enterprise" {
   type    = bool
   default = false
@@ -116,26 +80,11 @@ variable "nomadlicense" {
   type      = string
   sensitive = true
   default   = ""
-  # ephemeral   = true
 }
-
-# ---------------------------------------------------------------------------
-# HCP cluster tiers
-# ---------------------------------------------------------------------------
 
 variable "hcp_vault_cluster_tier" {
   type    = string
   default = "dev"
-}
-
-variable "hcp_consul_cluster_tier" {
-  type    = string
-  default = "development"
-}
-
-variable "hcp_consul_cluster_size" {
-  type    = string
-  default = "x_small"
 }
 
 variable "hcp_boundary_cluster_tier" {

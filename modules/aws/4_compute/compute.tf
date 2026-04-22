@@ -15,20 +15,19 @@ resource "random_id" "nomad_gossip_key" {
   byte_length = 16
 }
 
-# One cloud-init config per worker — each gets its own node name and ACL token
 data "cloudinit_config" "workers" {
   count = var.workers
 
   gzip          = true
   base64_encode = true
 
-  # Step 1 — install Docker
+  # Step 1 — Docker
   part {
     content_type = "text/x-shellscript"
     content      = file("${path.module}/templates/shared/docker.sh")
   }
 
-  # Step 2 — install Hashicorp binaries (consul, vault, nomad)
+  # Step 2 — Hashicorp binaries (consul, vault, nomad)
   part {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/shared/hashicorp.sh", {
@@ -36,18 +35,7 @@ data "cloudinit_config" "workers" {
     })
   }
 
-  # Step 3 — configure Consul client joined to HCP Consul
-  part {
-    content_type = "text/x-shellscript"
-    content = templatefile("${path.module}/templates/workers/consul.sh", {
-      node_name       = "${var.namespace}-worker-${count.index}"
-      hcp_config_file = var.hcp_consul_config_file
-      hcp_ca_file     = var.hcp_consul_ca_file
-      hcp_acl_token   = length(var.hcp_consul_acl_tokens) > count.index ? var.hcp_consul_acl_tokens[count.index] : ""
-    })
-  }
-
-  # Step 4 — configure Vault policies and token roles
+  # Step 3 — Vault policies and token roles
   part {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/workers/vault.sh", {
@@ -56,12 +44,12 @@ data "cloudinit_config" "workers" {
     })
   }
 
-  # Step 5 — configure and start Nomad (client + server)
+  # Step 4 — Nomad (client + server)
   part {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/workers/nomad.sh", {
       node_name        = "${var.namespace}-worker-${count.index}"
-      hcp_acl_token    = length(var.hcp_consul_acl_tokens) > count.index ? var.hcp_consul_acl_tokens[count.index] : ""
+      hcp_acl_token    = ""
       VAULT_ADDR       = var.vault_addr
       VAULT_TOKEN      = var.vault_token
       nomad_workers    = var.workers
@@ -70,7 +58,6 @@ data "cloudinit_config" "workers" {
       run_nomad_jobs   = var.run_nomad_jobs
       nomadlicense     = var.nomadlicense
       region           = var.region
-      # 1-based index for bootstrap-on-last-worker logic
       index                        = count.index + 1
       count                        = var.workers
       aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
