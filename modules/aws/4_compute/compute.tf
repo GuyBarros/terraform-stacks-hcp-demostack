@@ -26,21 +26,25 @@ data "cloudinit_config" "workers" {
 
   gzip          = true
   base64_encode = true
-
-  # Step 1 — Docker
+  
   part {
     content_type = "text/x-shellscript"
-    content      = file("${path.module}/templates/shared/docker.sh")
-  }
-
-  # Step 2 — Hashicorp binaries
-  part {
-    content_type = "text/x-shellscript"
-    content = templatefile("${path.module}/templates/shared/hashicorp.sh", {
-      enterprise = var.enterprise
+    content      = templatefile("${path.module}/templates/shared/base.sh",{
+    enterprise = var.enterprise
+    public_key = var.public_key
     })
   }
 
+    #tls
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/shared/tls.sh",{
+     me_ca     = tls_self_signed_cert.root.cert_pem
+    me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
+    me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
+    public_key = var.public_key
+    })
+  }
   # Step 3 — Vault policies and token roles
   # vault_token is only used here at first boot to set up policies.
   # Subsequent token rotations do NOT trigger instance replacement because
