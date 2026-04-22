@@ -1,3 +1,19 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.55"
+    }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.92"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.11"
+    }
+  }
+}
 # modules/hcp/clusters/main.tf
 # Creates HCP Vault, Boundary, and the HVN↔VPC peering.
 # HCP Consul has been removed — Nomad uses its native service discovery.

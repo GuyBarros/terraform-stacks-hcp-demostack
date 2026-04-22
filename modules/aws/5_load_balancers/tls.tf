@@ -1,3 +1,15 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.55"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0.5"
+    }
+  }
+}
 # modules/aws/5_load_balancers/tls.tf
 # ACM wildcard certificate for the ALB HTTPS listeners.
 # The root CA cert is generated in the compute module and passed in via

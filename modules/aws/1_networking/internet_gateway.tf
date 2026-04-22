@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.55"
+    }
+  }
+}
 
 data "aws_vpc" "demostack" {
   id = var.vpc_id
