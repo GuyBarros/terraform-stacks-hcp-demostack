@@ -22,10 +22,6 @@ resource "aws_key_pair" "demostack" {
 resource "aws_kms_key" "demostackVaultKeys" {
   description             = "KMS for the Vault Demo"
   deletion_window_in_days = 10
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_iam_role" "consul-join" {

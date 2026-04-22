@@ -47,5 +47,5 @@ deployment "primary" {
     hcp_vault_cluster_tier    = "dev"
     hcp_boundary_cluster_tier = "standard"
   }
-  destroy = true
+  destroy = false
 }
