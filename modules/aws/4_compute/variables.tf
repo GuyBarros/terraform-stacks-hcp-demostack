@@ -14,6 +14,7 @@ variable "enterprise" {
 variable "nomadlicense" {
   description = "Enterprise License for Nomad."
   default     = ""
+  ephemeral   = true
 }
 
 variable "instance_type_worker" {
@@ -89,6 +90,7 @@ variable "vault_addr" {
   description = "HCP Vault endpoint URL (private)."
   type        = string
   default     = ""
+  ephemeral   = true
 }
 
 variable "vault_token" {
@@ -96,6 +98,7 @@ variable "vault_token" {
   type        = string
   sensitive   = true
   default     = ""
+  ephemeral   = true
 }
 
 variable "aws_ebs_volume_prometheus_id" {
