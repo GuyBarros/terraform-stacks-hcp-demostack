@@ -29,8 +29,8 @@ deployment "primary" {
     hcp_client_secret = store.varset.hcp_credentials.hcp_client_secret
 
     # Network access — all pulled from variable set, no IPs in code
-    allowed_cidr_blocks = store.varset.hcp_credentials.allowed_cidr_blocks
-    host_access_ip      = store.varset.hcp_credentials.host_access_ip
+    allowed_cidr_blocks = nonsensitive(store.varset.hcp_credentials.allowed_cidr_blocks)
+    host_access_ip      = nonsensitive(store.varset.hcp_credentials.host_access_ip)
 
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCp8Zem9rjuBHS16G0np7TPH86kevPNfnV32aot/CDOGF2gBkAzkWQA78aV/FOq51GNHpw9ylcUCvxVp+4/tZiJ+MSyOCExtcrRb05Ni2ktV6FYelHA2kOTklUsQ/EbGUmtrsFWQH14N6a4DqVLjcLM/oWbhSDV9S0lKMd4hXOKON1wfjK/qLppsCZ5X6npvcghDs81bsjwMCgLtq4OWPYe6fhc/6i/eUfNYLjqmTAYOilL6gG6phg+Sdl/qveVOoJcXevUm7drk5lWVuSwq/pL2Q+NUBqfUa6nBZtb9Y2l5YCpgn7q58Nxqr/cqfawhKxPZswh4jnKfH9sHd9CWPmX guy@Guys-MacBook-Pro.local"
     zone_id    = "Z00667463MEBDLN9K48J2"
