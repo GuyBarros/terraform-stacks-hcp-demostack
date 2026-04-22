@@ -60,10 +60,10 @@ output "vault_address" {
 }
 
 output "vault_token" {
-  description = "HCP Vault admin token (sensitive)."
+  description = "HCP Vault admin token."
   type        = string
-  sensitive   = true
-  value       = component.hcp_clusters.vault_admin_token
+  sensitive   = false
+  value       = nonsensitive(component.hcp_clusters.vault_admin_token)
 }
 
 # ---------------------------------------------------------------------------
@@ -73,7 +73,7 @@ output "vault_token" {
 output "XX_boundary_config" {
   description = "Ready-to-use config block for the Boundary demo setup."
   type        = string
-  sensitive   = true
+  sensitive   = false
   value       = <<-EOF
     application_name          = "${var.namespace}"
     boundary_address          = "${component.hcp_clusters.boundary_cluster_url}"
@@ -81,7 +81,7 @@ output "XX_boundary_config" {
     boundary_username         = "admin"
     boundary_password         = "Welcome1!"
     vault_address             = "${component.hcp_clusters.vault_public_endpoint}"
-    vault_token               = "${component.hcp_clusters.vault_admin_token}"
+    vault_token               = "${nonsensitive(component.hcp_clusters.vault_admin_token)}"
     vault_namespace           = "boundary"
     nomad_address             = "${component.load_balancer.nomad_ui}"
     nomad_token               = ""

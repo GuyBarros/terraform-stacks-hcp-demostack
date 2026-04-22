@@ -120,6 +120,7 @@ component "compute" {
     aws       = provider.aws.this
     random    = provider.random.this
     cloudinit = provider.cloudinit.this
+    tls       = provider.tls.this
   }
 }
 
@@ -134,6 +135,7 @@ component "load_balancer" {
     zone_id                = var.zone_id
     workers                = var.workers
     region                 = var.region
+    tls_ca_cert_pem        = component.compute.tls_ca_cert_pem
   }
 
   providers = {

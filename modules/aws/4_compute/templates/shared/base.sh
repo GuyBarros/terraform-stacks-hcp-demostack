@@ -3,13 +3,6 @@ set -x
 
 echo "==> Base"
 
-echo "==> getting the aws metadata token"
-export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-
-echo "==> check token was set"
-echo $TOKEN
-
-
 echo "==> libc6 issue workaround"
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 
@@ -46,16 +39,10 @@ echo "--> Adding Hashicorp repo"
 wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
-echo "--> Adding Microsoft repo"
-sudo apt-get install wget gpg
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" |sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
-rm -f packages.microsoft.gpg
 
 
 echo "--> updated version of Nodejs"
-curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 sudo apt update
 
@@ -81,13 +68,11 @@ sudo apt-get install -y \
   curl \
   gnupg-agent \
   software-properties-common \
-  openjdk-17-jdk-headless \
+  openjdk-14-jdk-headless \
   prometheus-node-exporter \
   golang-go \
   alien \
   waypoint \
-  qemu-system \
-  code \
   &>/dev/null
 
 
@@ -103,7 +88,6 @@ sudo apt-get install -y \
   vault \
   consul \
   nomad  \
-  boundary \
   &>/dev/null
 
 else
@@ -111,7 +95,6 @@ sudo apt-get install -y \
   vault-enterprise \
   consul-enterprise \
   nomad-enterprise  \
-  boundary-enterprise \
   &>/dev/null
 
 fi
@@ -120,29 +103,17 @@ fi
 #  curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin
 #  getenvoy run standard:1.16.0 -- --version
 #  sudo cp ~/.getenvoy/builds/standard/1.16.0/linux_glibc/bin/envoy /usr/bin/
-echo "==> Docker"
 
-#uninstall all conflicting packages
-# for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done"
+# envoy --version
+echo "---> Install latest Envoy"
+sudo apt update
+sudo apt install apt-transport-https gnupg2 curl lsb-release
+curl -sL 'https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key' | sudo gpg --dearmor -o /usr/share/keyrings/getenvoy-keyring.gpg
+Verify the keyring - this should yield "OK"
+echo a077cb587a1b622e03aa4bf2f3689de14658a9497a9af2c427bba5f4cc3c4723 /usr/share/keyrings/getenvoy-keyring.gpg | sha256sum --check
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/getenvoy-keyring.gpg] https://deb.dl.getenvoy.io/public/deb/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/getenvoy.list
+sudo apt update
+sudo apt install -y getenvoy-envoy
 
-# Add Docker's official GPG key:
-sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
-# Add the repository to Apt sources:
-echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-sudo usermod -aG docker "$(whoami)"
-
-echo "==> Docker is done!"
 
 echo "==> Base is done!"

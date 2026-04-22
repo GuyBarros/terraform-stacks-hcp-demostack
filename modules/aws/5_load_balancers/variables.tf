@@ -36,3 +36,8 @@ variable "region" {
   default     = "eu-west-2"
   type = string
 }
+variable "tls_ca_cert_pem" {
+  description = "Root CA cert PEM from the compute component — used for ACM import if needed."
+  type        = string
+  default     = ""
+}

@@ -13,3 +13,8 @@ output "nomad_gossip_key" {
   value       = random_id.nomad_gossip_key.b64_std
   sensitive   = true
 }
+
+output "tls_ca_cert_pem" {
+  description = "Root CA certificate PEM — passed to load_balancer for ACM wildcard cert."
+  value       = tls_self_signed_cert.root.cert_pem
+}
