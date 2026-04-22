@@ -1,7 +1,4 @@
 # outputs.tfcomponent.hcl
-# Mirrors the outputs from the original terraform-hcp-demostack-aws repo,
-# adapted for the Stacks component structure. consul_address and consul_token
-# are omitted as HCP Consul has been removed from this stack.
 
 # ---------------------------------------------------------------------------
 # Load balancer endpoints
@@ -10,7 +7,7 @@
 output "workers" {
   description = "FQDN of each worker node (Route 53 records)."
   type        = map(string)
-  value       = { for k, v in component.load_balancer.workers : k => v.fqdn }
+  value       = component.load_balancer.workers != null ? { for k, v in component.load_balancer.workers : k => v.fqdn } : {}
 }
 
 output "traefik_lb" {
@@ -74,16 +71,16 @@ output "XX_boundary_config" {
   description = "Ready-to-use config block for the Boundary demo setup."
   type        = string
   sensitive   = false
-  value       = <<-EOF
-    application_name          = "${var.namespace}"
-    boundary_address          = "${component.hcp_clusters.boundary_cluster_url}"
-    boundary_auth_method_id   = ""
-    boundary_username         = "admin"
-    boundary_password         = "Welcome1!"
-    vault_address             = "${component.hcp_clusters.vault_public_endpoint}"
-    vault_token               = "${nonsensitive(component.hcp_clusters.vault_admin_token)}"
-    vault_namespace           = "boundary"
-    nomad_address             = "${component.load_balancer.nomad_ui}"
-    nomad_token               = ""
-  EOF
+  value = join("\n", [
+    "application_name        = \"${var.namespace}\"",
+    "boundary_address        = \"${coalesce(component.hcp_clusters.boundary_cluster_url, "pending")}\"",
+    "boundary_auth_method_id = \"\"",
+    "boundary_username       = \"admin\"",
+    "boundary_password       = \"Welcome1!\"",
+    "vault_address           = \"${coalesce(component.hcp_clusters.vault_public_endpoint, "pending")}\"",
+    "vault_token             = \"${nonsensitive(coalesce(component.hcp_clusters.vault_admin_token, "pending"))}\"",
+    "vault_namespace         = \"boundary\"",
+    "nomad_address           = \"${coalesce(component.load_balancer.nomad_ui, "pending")}\"",
+    "nomad_token             = \"\"",
+  ])
 }
