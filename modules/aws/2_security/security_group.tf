@@ -6,12 +6,12 @@ resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
   vpc_id      = data.aws_vpc.demostack.id
 
-  # Allow all internal traffic between nodes in the same SG
+  # Allow all internal traffic within the VPC
   ingress {
-    from_port = -1
-    to_port   = -1
-    protocol  = -1
-    self      = true
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [data.aws_vpc.demostack.cidr_block]
   }
 
   # SSH
