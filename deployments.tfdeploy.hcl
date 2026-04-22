@@ -10,7 +10,7 @@ identity_token "aws" {
 #   Then paste the variable set ID below.
 
 store "varset" "hcp_credentials" {
-  id       = "varset-REPLACE_WITH_YOUR_VARSET_ID"
+  id       = "varset-onaF4oTg6YsQj69W"
   category = "terraform"
 }
 
