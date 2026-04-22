@@ -47,15 +47,13 @@ variable "public_key" {
 }
 
 variable "host_access_ip" {
-  type      = list(string)
-  sensitive = true
-  default   = []
+  type    = list(string)
+  default = []
 }
 
 variable "allowed_cidr_blocks" {
-  description = "CIDR blocks allowed to reach service ports (Vault, Nomad, Fabio, DBs). Pull from variable set."
+  description = "CIDR blocks allowed to reach service ports (Vault, Nomad, Fabio, DBs)."
   type        = list(string)
-  sensitive   = true
   default     = ["0.0.0.0/0"]
 }
 

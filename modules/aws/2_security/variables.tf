@@ -9,13 +9,11 @@ variable "namespace" {
 variable "host_access_ip" {
   description = "CIDR blocks allowed SSH/RDP/LDAP access (your operator IP)."
   type        = list(string)
-  sensitive   = true
 }
 
 variable "allowed_cidr_blocks" {
-  description = "CIDR blocks allowed access to service ports (Vault, Nomad, Fabio, DBs etc). Comes from the variable set."
+  description = "CIDR blocks allowed access to service ports (Vault, Nomad, Fabio, DBs etc)."
   type        = list(string)
-  sensitive   = true
   default     = ["0.0.0.0/0"]
 }
 

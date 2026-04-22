@@ -4,12 +4,10 @@ identity_token "aws" {
   audience = ["aws.workload.identity"]
 }
 
-# Pull credentials and network config from a variable set.
+# Pull credentials from a variable set.
 # Setup: HCP Terraform → Settings → Variable Sets → New Variable Set
 #   Add: hcp_client_id        (Terraform, plain text)
 #   Add: hcp_client_secret    (Terraform, sensitive)
-#   Add: allowed_cidr_blocks  (Terraform, plain text) e.g. ["10.0.0.0/8","203.0.113.5/32"]
-#   Add: host_access_ip       (Terraform, plain text) e.g. ["203.0.113.5/32"]
 #   Then paste the variable set ID below.
 
 store "varset" "hcp_credentials" {
@@ -28,9 +26,9 @@ deployment "primary" {
     hcp_client_id     = store.varset.hcp_credentials.hcp_client_id
     hcp_client_secret = store.varset.hcp_credentials.hcp_client_secret
 
-    # Network access — all pulled from variable set, no IPs in code
-    allowed_cidr_blocks = nonsensitive(store.varset.hcp_credentials.allowed_cidr_blocks)
-    host_access_ip      = nonsensitive(store.varset.hcp_credentials.host_access_ip)
+    # Network access — plain values, not secrets
+    allowed_cidr_blocks = ["10.0.0.0/8"]
+    host_access_ip      = ["191.255.89.24/32"]
 
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCp8Zem9rjuBHS16G0np7TPH86kevPNfnV32aot/CDOGF2gBkAzkWQA78aV/FOq51GNHpw9ylcUCvxVp+4/tZiJ+MSyOCExtcrRb05Ni2ktV6FYelHA2kOTklUsQ/EbGUmtrsFWQH14N6a4DqVLjcLM/oWbhSDV9S0lKMd4hXOKON1wfjK/qLppsCZ5X6npvcghDs81bsjwMCgLtq4OWPYe6fhc/6i/eUfNYLjqmTAYOilL6gG6phg+Sdl/qveVOoJcXevUm7drk5lWVuSwq/pL2Q+NUBqfUa6nBZtb9Y2l5YCpgn7q58Nxqr/cqfawhKxPZswh4jnKfH9sHd9CWPmX guy@Guys-MacBook-Pro.local"
     zone_id    = "Z00667463MEBDLN9K48J2"
