@@ -14,7 +14,7 @@ variable "enterprise" {
 variable "nomadlicense" {
   description = "Enterprise License for Nomad."
   default     = ""
-  ephemeral   = true
+  #ephemeral   = true
 }
 
 variable "instance_type_worker" {
