@@ -3,6 +3,18 @@
 identity_token "aws" {
   audience = ["aws.workload.identity"]
 }
+
+# ---------------------------------------------------------------------------
+# Pull HCP Service Principal credentials from an HCP Terraform variable set.
+# 
+# Setup steps:
+#   1. HCP Terraform → Settings → Variable Sets → New Variable Set
+#   2. Add variable: hcp_client_id        (Terraform, plain text)
+#   3. Add variable: hcp_client_secret    (Terraform, sensitive)
+#   4. Name the set "hcp_credentials" (or update the name below)
+#   5. Assign it to your project or make it global
+# ---------------------------------------------------------------------------
+
 store "varset" "hcp_credentials" {
   id       = "varset-onaF4oTg6YsQj69W"
   category = "terraform"
@@ -17,8 +29,7 @@ deployment "primary" {
     identity_token = identity_token.aws.jwt
     role_arn       = "arn:aws:iam::958215610051:role/tfc_stacks_test"
 
-    # HCP Service Principal — create one at portal.cloud.hashicorp.com
-    # → Access Control → Service Principals → New Service Principal (Contributor)
+    # HCP credentials pulled from variable set — no secrets in code
     hcp_client_id     = store.varset.hcp_credentials.hcp_client_id
     hcp_client_secret = store.varset.hcp_credentials.hcp_client_secret
 
@@ -34,7 +45,7 @@ deployment "primary" {
     run_nomad_jobs       = "0"
     cni_plugin_url       = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
 
-    enterprise   = true
+    enterprise   = false
     nomadlicense = store.varset.hcp_credentials.nomad_license
 
     hcp_vault_cluster_tier    = "dev"

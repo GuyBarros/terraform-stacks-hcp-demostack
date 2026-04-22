@@ -21,11 +21,13 @@ variable "role_arn" {
 
 variable "hcp_client_id" {
   type        = string
+  ephemeral   = true
   description = "HCP Service Principal client ID."
 }
 
 variable "hcp_client_secret" {
   type        = string
+  ephemeral   = true
   sensitive   = true
   description = "HCP Service Principal client secret."
 }
