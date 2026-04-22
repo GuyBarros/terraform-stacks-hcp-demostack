@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.55"
-    }
-  }
-}
-
 data "aws_availability_zones" "available" {}
 
 resource "aws_ebs_volume" "mysql" {
