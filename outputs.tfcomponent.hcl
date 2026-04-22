@@ -9,7 +9,8 @@
 
 output "workers" {
   description = "FQDN of each worker node (Route 53 records)."
-  value       = component.load_balancer.workers
+  type        = map(string)
+  value       = { for k, v in component.load_balancer.workers : k => v.fqdn }
 }
 
 output "traefik_lb" {
