@@ -90,7 +90,7 @@ variable "vault_addr" {
   description = "HCP Vault endpoint URL (private)."
   type        = string
   default     = ""
-  ephemeral   = true
+  #ephemeral   = true
 }
 
 variable "vault_token" {
@@ -98,7 +98,7 @@ variable "vault_token" {
   type        = string
   sensitive   = true
   default     = ""
-  ephemeral   = true
+  #ephemeral   = true
 }
 
 variable "aws_ebs_volume_prometheus_id" {
