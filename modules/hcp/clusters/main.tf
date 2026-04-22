@@ -62,6 +62,13 @@ resource "hcp_vault_cluster" "demostack" {
 
 resource "hcp_vault_cluster_admin_token" "root" {
   cluster_id = hcp_vault_cluster.demostack.cluster_id
+
+  # Admin tokens have a 6-hour TTL and the HCP provider will show a diff on
+  # every plan as the token expires. ignore_changes stops the perpetual
+  # plan/apply cycle. Rotate manually when needed by tainting this resource.
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # ---------------------------------------------------------------------------
@@ -73,4 +80,10 @@ resource "hcp_boundary_cluster" "demostack" {
   username   = "admin"
   password   = "Welcome1!"
   tier       = var.hcp_boundary_cluster_tier
+
+  lifecycle {
+    # The HCP API does not return the password after creation, causing a
+    # perpetual diff. ignore_changes prevents the plan/apply loop.
+    ignore_changes = [password]
+  }
 }

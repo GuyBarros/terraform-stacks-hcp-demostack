@@ -11,8 +11,14 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
+# Gossip key uses a keeper so it only regenerates when the namespace changes,
+# not on every plan. This prevents user_data churn → instance replacement loops.
 resource "random_id" "nomad_gossip_key" {
   byte_length = 16
+
+  keepers = {
+    namespace = var.namespace
+  }
 }
 
 data "cloudinit_config" "workers" {
@@ -27,7 +33,7 @@ data "cloudinit_config" "workers" {
     content      = file("${path.module}/templates/shared/docker.sh")
   }
 
-  # Step 2 — Hashicorp binaries (consul, vault, nomad)
+  # Step 2 — Hashicorp binaries
   part {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/shared/hashicorp.sh", {
@@ -36,6 +42,9 @@ data "cloudinit_config" "workers" {
   }
 
   # Step 3 — Vault policies and token roles
+  # vault_token is only used here at first boot to set up policies.
+  # Subsequent token rotations do NOT trigger instance replacement because
+  # user_data_replace_on_change is false — see aws_instance below.
   part {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/workers/vault.sh", {
@@ -97,6 +106,16 @@ resource "aws_instance" "workers" {
     Name     = "demostack-worker-${count.index}"
   }
 
-  user_data_replace_on_change = true
+  # Do NOT replace instances when user_data changes after initial creation.
+  # The vault_token and gossip key are bootstrap values — rotating them in
+  # HCP does not require rebuilding the fleet. Set to true only deliberately
+  # (e.g. during a full cluster repave).
+  user_data_replace_on_change = false
   user_data_base64            = element(data.cloudinit_config.workers[*].rendered, count.index)
+
+  lifecycle {
+    # Prevent AMI updates from silently replacing running workers.
+    # Update ami deliberately when you want to repave.
+    ignore_changes = [ami, user_data_base64]
+  }
 }
