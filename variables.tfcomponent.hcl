@@ -51,6 +51,12 @@ variable "host_access_ip" {
   default = []
 }
 
+variable "allowed_cidr_blocks" {
+  description = "CIDR blocks allowed to reach service ports (Vault, Nomad, Fabio, DBs). Pull from variable set."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "workers" {
   type    = string
   default = "3"

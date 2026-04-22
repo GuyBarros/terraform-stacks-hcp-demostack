@@ -1,4 +1,3 @@
-
 data "aws_vpc" "demostack" {
   id = var.vpc_id
 }
@@ -6,15 +5,16 @@ data "aws_vpc" "demostack" {
 resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
   vpc_id      = data.aws_vpc.demostack.id
-  #Allow internal communication between nodes
+
+  # Allow all internal traffic between nodes in the same SG
   ingress {
     from_port = -1
     to_port   = -1
     protocol  = -1
+    self      = true
   }
 
-
-  # SSH access if host_access_ip has CIDR blocks
+  # SSH
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
@@ -24,7 +24,8 @@ resource "aws_security_group" "demostack" {
       cidr_blocks = [ingress.value]
     }
   }
-  # RDS access if host_access_ip has CIDR blocks
+
+  # RDP
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
@@ -35,8 +36,7 @@ resource "aws_security_group" "demostack" {
     }
   }
 
-  # LDAP
-  #TCP
+  # LDAP TCP + UDP
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
@@ -46,7 +46,6 @@ resource "aws_security_group" "demostack" {
       cidr_blocks = [ingress.value]
     }
   }
-
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
@@ -57,9 +56,7 @@ resource "aws_security_group" "demostack" {
     }
   }
 
-
-  # sLDAP
-   #TCP
+  # LDAPS TCP + UDP
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
@@ -69,7 +66,6 @@ resource "aws_security_group" "demostack" {
       cidr_blocks = [ingress.value]
     }
   }
-  #UDP
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
@@ -79,169 +75,137 @@ resource "aws_security_group" "demostack" {
       cidr_blocks = [ingress.value]
     }
   }
-/*
-  ingress {
-    from_port   = 389
-    to_port     = 389
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block]
+
+  # HTTP / HTTPS
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
-  ingress {
-    from_port   = 389
-    to_port     = 389
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block]
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-  ingress {
-    from_port   = 636
-    to_port     = 636
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block]
-  }
-  ingress {
-    from_port   = 636
-    to_port     = 636
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block]
+  # Vault, Consul, Boundary (8000-9300)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 8000
+      to_port     = 9300
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-  #Demostack Postgres + pgadmin
-  ingress {
-    from_port   = 5000
-    to_port     = 5500
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-  #waypoint ports
-  ingress {
-    from_port   = 9700
-    to_port     = 9702
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # Fabio (9998-9999)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 9998
+      to_port     = 9999
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-
-  #Consul and Vault and Boundary ports
-  ingress {
-    from_port   = 8000
-    to_port     = 9300
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # Nomad (3000-4999, 20000-29999, 30000-39999)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 3000
+      to_port     = 4999
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
-  #Fabio Ports
-  ingress {
-    from_port   = 9998
-    to_port     = 9999
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 20000
+      to_port     = 29999
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
-  #Nomad
-  ingress {
-    from_port   = 3000
-    to_port     = 4999
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-  #More nomad ports
-  ingress {
-    from_port   = 20000
-    to_port     = 29999
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 30000
-    to_port     = 39999
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 30000
+      to_port     = 39999
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # Waypoint (9700-9702)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 9700
+      to_port     = 9702
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # Postgres + pgAdmin (5000-5500)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 5000
+      to_port     = 5500
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # MySQL (3306)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-  
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # PostgreSQL (5432)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
+  # Oracle (1521)
+  dynamic "ingress" {
+    for_each = var.allowed_cidr_blocks
+    content {
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
-  
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-
-  
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-
-  
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "udp"
-    cidr_blocks = [hcp_hvn.demostack.cidr_block,"0.0.0.0/0"]
-  }
-
-*/
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
-

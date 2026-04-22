@@ -38,12 +38,13 @@ component "security" {
   source = "./modules/aws/2_security"
 
   inputs = {
-    namespace      = var.namespace
-    vpc_id         = component.vpc.vpc.id
-    host_access_ip = var.host_access_ip
-    workers        = var.workers
-    region         = var.region
-    zone_id        = var.zone_id
+    namespace           = var.namespace
+    vpc_id              = component.vpc.vpc.id
+    host_access_ip      = var.host_access_ip
+    allowed_cidr_blocks = var.allowed_cidr_blocks
+    workers             = var.workers
+    region              = var.region
+    zone_id             = var.zone_id
   }
 
   providers = {

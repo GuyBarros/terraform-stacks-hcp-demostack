@@ -1,31 +1,35 @@
 variable "vpc_id" {
- description = "VPC where resources will be created in"      
+  description = "VPC where the security group will be created."
 }
 
 variable "namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
+  description = "Unique deployment identifier used as the security group name prefix."
 }
 
 variable "host_access_ip" {
-  description = "list of CIDR blocks allowed to connect via SSH on port 22 e.g. your public ip format: [\"95.42.355.111/32\"]"
+  description = "CIDR blocks allowed SSH/RDP/LDAP access (your operator IP)."
   type        = list(string)
 }
 
+variable "allowed_cidr_blocks" {
+  description = "CIDR blocks allowed access to service ports (Vault, Nomad, Fabio, DBs etc). Comes from the variable set."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "workers" {
-  description = "The number of nomad worker vms to create."
+  description = "Number of worker VMs."
+  type        = string
   default     = "3"
-  type = string
 }
 
 variable "region" {
-  description = "The region to create resources."
+  description = "AWS region."
+  type        = string
   default     = "eu-west-2"
-  type = string
 }
 
 variable "zone_id" {
-  description = "The Zone ID which Holds the FQDN to which the subdomains will be added "
-  type = string
+  description = "Route 53 hosted zone ID."
+  type        = string
 }
