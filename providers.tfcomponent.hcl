@@ -1,11 +1,21 @@
 # providers.tfcomponent.hcl
-# Declares all provider requirements and configurations for the stack.
-# AWS uses OIDC workload identity (web_identity) — no static keys needed.
 
 required_providers {
   aws = {
     source  = "hashicorp/aws"
     version = "~> 5.55"
+  }
+  hcp = {
+    source  = "hashicorp/hcp"
+    version = "~> 0.92"
+  }
+  consul = {
+    source  = "hashicorp/consul"
+    version = "~> 2.20"
+  }
+  time = {
+    source  = "hashicorp/time"
+    version = "~> 0.11"
   }
   tls = {
     source  = "hashicorp/tls"
@@ -22,7 +32,7 @@ required_providers {
 }
 
 # ---------------------------------------------------------------------------
-# AWS provider — region and OIDC role are injected per-deployment
+# AWS — OIDC workload identity
 # ---------------------------------------------------------------------------
 
 provider "aws" "this" {
@@ -36,8 +46,31 @@ provider "aws" "this" {
   }
 }
 
+# ---------------------------------------------------------------------------
+# HCP — Service Principal credentials from deployment inputs
+# ---------------------------------------------------------------------------
+
+provider "hcp" "this" {
+  config {
+    client_id     = var.hcp_client_id
+    client_secret = var.hcp_client_secret
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Consul — configured using hcp_clusters component outputs.
+# The hcp_config component uses this provider to create ACL resources.
+# ---------------------------------------------------------------------------
+
+provider "consul" "this" {
+  config {
+    address    = component.hcp_clusters.consul_public_endpoint
+    datacenter = component.hcp_clusters.consul_datacenter
+    token      = component.hcp_clusters.consul_root_token
+  }
+}
+
+provider "time" "this" {}
 provider "tls" "this" {}
-
 provider "cloudinit" "this" {}
-
 provider "random" "this" {}

@@ -1,142 +1,87 @@
- data "aws_ami" "ubuntu" {
-   most_recent = true
-   filter {
-     name = "name"
-     # values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-     # values = ["ubuntu/images/*ubuntu-hirsute-21.04-amd64-server-*"]
-     values = ["ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"]
-   }
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["099720109477"] # Canonical
+}
 
-   filter {
-     name   = "virtualization-type"
-     values = ["hvm"]
-   }
-
-   owners = ["099720109477"] # Canonical
- }
-
-# Nomad gossip encryption key
 resource "random_id" "nomad_gossip_key" {
   byte_length = 16
 }
 
-# Gzip cloud-init config
+# One cloud-init config per worker — each gets its own node name and ACL token
 data "cloudinit_config" "workers" {
   count = var.workers
 
   gzip          = true
   base64_encode = true
 
-  # #base
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   content      = templatefile("${path.module}/templates/shared/base.sh",{
-  #     enterprise = var.enterprise
-  #    me_ca     = tls_self_signed_cert.root.cert_pem
-  #   me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
-  #   me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
-  #   public_key = var.public_key
-  #   })
-  # }
-   #docker
-   part {
-     content_type = "text/x-shellscript"
-     content      = file("${path.module}/templates/shared/docker.sh")
-   }
-    #hashicorp
+  # Step 1 — install Docker
   part {
     content_type = "text/x-shellscript"
-    content      = templatefile("${path.module}/templates/shared/hashicorp.sh",{
+    content      = file("${path.module}/templates/shared/docker.sh")
+  }
+
+  # Step 2 — install Hashicorp binaries (consul, vault, nomad)
+  part {
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/templates/shared/hashicorp.sh", {
       enterprise = var.enterprise
     })
   }
 
-  #   #tls
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   content      = templatefile("${path.module}/templates/shared/tls.sh",{
-  #    me_ca     = tls_self_signed_cert.root.cert_pem
-  #   me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
-  #   me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
-  #   public_key = var.public_key
-  #   })
-  # }
+  # Step 3 — configure Consul client joined to HCP Consul
+  part {
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/templates/workers/consul.sh", {
+      node_name       = "${var.namespace}-worker-${count.index}"
+      hcp_config_file = var.hcp_consul_config_file
+      hcp_ca_file     = var.hcp_consul_ca_file
+      hcp_acl_token   = length(var.hcp_consul_acl_tokens) > count.index ? var.hcp_consul_acl_tokens[count.index] : ""
+    })
+  }
 
-  
+  # Step 4 — configure Vault policies and token roles
+  part {
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/templates/workers/vault.sh", {
+      VAULT_ADDR  = var.vault_addr
+      VAULT_TOKEN = var.vault_token
+    })
+  }
 
-  # #consul
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   content      = templatefile("${path.module}/templates/workers/consul.sh",{
-  #   node_name  = "${var.namespace}-worker-${count.index}" #"
-  #     # HCP Consul
-  #   hcp_config_file = hcp_consul_cluster.hcp_demostack.consul_config_file
-  #   hcp_ca_file     = hcp_consul_cluster.hcp_demostack.consul_ca_file
-  #   hcp_acl_token   = element(data.consul_acl_token_secret_id.token.*.secret_id, count.index)
-
-  #   })
-  # }
-
-  # #vault
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   content      = templatefile("${path.module}/templates/workers/vault.sh",{
-  #   VAULT_ADDR  = hcp_vault_cluster.hcp_demostack.vault_private_endpoint_url
-  #   VAULT_TOKEN = hcp_vault_cluster_admin_token.root.token
-  #   })
-  # }
-
-  #   #nomad
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   content      = templatefile("${path.module}/templates/workers/nomad.sh",{
-  #   node_name  = "${var.namespace}-worker-${count.index}"
-  #   hcp_acl_token   = element(data.consul_acl_token_secret_id.token.*.secret_id, count.index)
-  #   VAULT_ADDR  = hcp_vault_cluster.hcp_demostack.vault_private_endpoint_url
-  #   VAULT_TOKEN = hcp_vault_cluster_admin_token.root.token
-  #   # Nomad
-  #   nomad_workers    = var.workers
-  #   nomad_gossip_key = base64encode(random_id.nomad_gossip_key.hex)
-  #   cni_plugin_url   = var.cni_plugin_url
-  #   run_nomad_jobs   = var.run_nomad_jobs
-  #   nomadlicense     = var.nomadlicense
-  #   # Nomad EBS Volumes
-  #   region     = var.region
-  #   index                        = count.index + 1
-  #   count                        = var.workers
-  #   dc1                          = data.aws_availability_zones.available.names[0]
-  #   dc2                          = data.aws_availability_zones.available.names[1]
-  #   dc3                          = data.aws_availability_zones.available.names[2]
-  #   aws_ebs_volume_mysql_id      = aws_ebs_volume.shared.id
-  #   aws_ebs_volume_mongodb_id    = aws_ebs_volume.mongodb.id
-  #   aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
-  #   aws_ebs_volume_shared_id     = aws_ebs_volume.shared.id
-  #   })
-  # }
-
-  #     #EBS
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   content      = templatefile("${path.module}/templates/workers/ebs_volumes.sh",{
-  #   region     = var.region
-  #   # Nomad EBS Volumes
-  #   index                        = count.index + 1
-  #   count                        = var.workers
-  #   dc1                          = data.aws_availability_zones.available.names[0]
-  #   dc2                          = data.aws_availability_zones.available.names[1]
-  #   dc3                          = data.aws_availability_zones.available.names[2]
-  #   aws_ebs_volume_mysql_id      = aws_ebs_volume.shared.id
-  #   aws_ebs_volume_mongodb_id    = aws_ebs_volume.mongodb.id
-  #   aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
-  #   aws_ebs_volume_shared_id     = aws_ebs_volume.shared.id
-  #   })
-  # }
+  # Step 5 — configure and start Nomad (client + server)
+  part {
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/templates/workers/nomad.sh", {
+      node_name        = "${var.namespace}-worker-${count.index}"
+      hcp_acl_token    = length(var.hcp_consul_acl_tokens) > count.index ? var.hcp_consul_acl_tokens[count.index] : ""
+      VAULT_ADDR       = var.vault_addr
+      VAULT_TOKEN      = var.vault_token
+      nomad_workers    = var.workers
+      nomad_gossip_key = random_id.nomad_gossip_key.b64_std
+      cni_plugin_url   = var.cni_plugin_url
+      run_nomad_jobs   = var.run_nomad_jobs
+      nomadlicense     = var.nomadlicense
+      region           = var.region
+      # 1-based index for bootstrap-on-last-worker logic
+      index                        = count.index + 1
+      count                        = var.workers
+      aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
+      aws_ebs_volume_shared_id     = aws_ebs_volume.shared.id
+    })
+  }
 }
 
 resource "aws_instance" "workers" {
   count = var.workers
 
- #  ami           = data.hcp_packer_image.demostack.cloud_image_id
   ami           = data.aws_ami.ubuntu.image_id
   instance_type = var.instance_type_worker
   key_name      = var.aws_key_pair_id
@@ -146,7 +91,6 @@ resource "aws_instance" "workers" {
   subnet_id              = element(var.subnet_ids[*], count.index)
   iam_instance_profile   = var.aws_iam_instance_profile_name
   vpc_security_group_ids = var.vpc_security_group_ids
-
 
   root_block_device {
     volume_size           = "240"
@@ -161,11 +105,11 @@ resource "aws_instance" "workers" {
   }
 
   tags = {
-    Purpose  = var.namespace,
-    Function = "worker",
-    Name     = "demostack-worker-${count.index}", #"
+    Purpose  = var.namespace
+    Function = "worker"
+    Name     = "demostack-worker-${count.index}"
   }
 
   user_data_replace_on_change = true
-  user_data_base64 = element(data.cloudinit_config.workers.*.rendered, count.index)
+  user_data_base64            = element(data.cloudinit_config.workers[*].rendered, count.index)
 }

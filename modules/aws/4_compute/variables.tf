@@ -1,8 +1,5 @@
 variable "namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-
+  description = "Differentiates different demostack deployments on the same account."
 }
 
 variable "public_key" {
@@ -10,18 +7,17 @@ variable "public_key" {
 }
 
 variable "enterprise" {
-  description = "do you want to use the enterprise version of Nomad"
+  description = "Install enterprise binaries."
   default     = false
 }
 
 variable "nomadlicense" {
-  description = "Enterprise License for Nomad"
+  description = "Enterprise License for Nomad."
   default     = ""
 }
 
-
 variable "instance_type_worker" {
-  description = "The type(size) of data workers (consul, nomad, etc)."
+  description = "EC2 instance type for worker nodes."
   default     = "t3.medium"
 }
 
@@ -29,43 +25,87 @@ variable "run_nomad_jobs" {
   default = "0"
 }
 
-
 variable "workers" {
-  description = "The number of nomad worker vms to create."
+  description = "Number of Nomad worker VMs to create."
   default     = "3"
 }
 
 variable "region" {
-  description = "The region to create resources."
+  description = "AWS region."
   default     = "eu-west-2"
 }
 
 variable "cni_plugin_url" {
-  description = "The url to download teh CNI plugin for nomad."
+  description = "URL to download the CNI plugin tarball."
   default     = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
 }
 
-variable "subnet_ids"{
-  description = "the list of subnet ids"
-  type = list(string)
+variable "subnet_ids" {
+  type    = list(string)
   default = [""]
 }
 
-variable "vpc_security_group_ids"{
-  description = "the security group id"
-  type = list(string)
+variable "vpc_security_group_ids" {
+  type    = list(string)
   default = [""]
 }
 
 variable "aws_iam_instance_profile_name" {
-  description = "the IAM instance profile name for compute instance"
-  type = string
+  type    = string
   default = ""
 }
 
-
 variable "aws_key_pair_id" {
-  description = "the AWS Key pair id that will be used for remote access to compute instances"
-  type = string
+  type    = string
   default = ""
+}
+
+# ---------------------------------------------------------------------------
+# HCP values — injected from the hcp component outputs
+# ---------------------------------------------------------------------------
+
+variable "hcp_consul_config_file" {
+  description = "Base64-encoded HCP Consul client config."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "hcp_consul_ca_file" {
+  description = "Base64-encoded HCP Consul CA certificate."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "hcp_consul_acl_tokens" {
+  description = "Per-worker Consul ACL token secret IDs (one per worker)."
+  type        = list(string)
+  sensitive   = true
+  default     = []
+}
+
+variable "vault_addr" {
+  description = "HCP Vault endpoint URL (private)."
+  type        = string
+  default     = ""
+}
+
+variable "vault_token" {
+  description = "HCP Vault admin token for bootstrapping."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "aws_ebs_volume_prometheus_id" {
+  description = "EBS volume ID for Prometheus data."
+  type        = string
+  default     = ""
+}
+
+variable "aws_ebs_volume_shared_id" {
+  description = "EBS volume ID for shared Nomad data."
+  type        = string
+  default     = ""
 }

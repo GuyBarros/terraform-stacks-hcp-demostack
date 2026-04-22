@@ -1,8 +1,9 @@
 # components.tfcomponent.hcl
-# Each AWS sub-module is a separate Stack component so HCP Terraform can
-# manage independent state slices and surface a clear dependency graph.
-# Regions are driven by var.region, which is set per-deployment in
-# deployments.tfdeploy.hcl.
+# Dependency order:
+#   vpc → networking + security → rds
+#   vpc → hcp_clusters → hcp_config
+#   networking + security + vpc + hcp_clusters + hcp_config → compute
+#   vpc + networking + security → load_balancer
 
 # ---------------------------------------------------------------------------
 # Layer 0 — VPC, IAM instance profile, SSH key pair
@@ -81,7 +82,59 @@ component "rds" {
 }
 
 # ---------------------------------------------------------------------------
-# Layer 4 — EC2 compute workers
+# Layer 4a — HCP clusters: HVN peering, Vault, Consul, Boundary
+# Uses only the hcp + aws providers. Outputs cluster endpoints so the
+# stack-level consul provider can be configured before hcp_config runs.
+# ---------------------------------------------------------------------------
+
+component "hcp_clusters" {
+  source = "./modules/hcp/clusters"
+
+  inputs = {
+    namespace      = var.namespace
+    region         = var.region
+    vpc_id         = component.vpc.vpc.id
+    vpc_cidr_block = var.vpc_cidr_block
+
+    hcp_vault_cluster_tier    = var.hcp_vault_cluster_tier
+    hcp_consul_cluster_tier   = var.hcp_consul_cluster_tier
+    hcp_consul_cluster_size   = var.hcp_consul_cluster_size
+    hcp_boundary_cluster_tier = var.hcp_boundary_cluster_tier
+  }
+
+  providers = {
+    aws  = provider.aws.this
+    hcp  = provider.hcp.this
+    time = provider.time.this
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Layer 4b — HCP config: ACL policies/tokens, Consul service registrations
+# The consul provider is configured at the stack level using hcp_clusters
+# outputs, so this component simply uses provider.consul.this.
+# ---------------------------------------------------------------------------
+
+component "hcp_config" {
+  source = "./modules/hcp/config"
+
+  inputs = {
+    consul_datacenter      = component.hcp_clusters.consul_datacenter
+    workers                = tonumber(var.workers)
+    vault_private_endpoint = component.hcp_clusters.vault_private_endpoint
+    boundary_cluster_url   = component.hcp_clusters.boundary_cluster_url
+  }
+
+  providers = {
+    consul = provider.consul.this
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Layer 5 — EC2 compute workers
+# Receives HCP endpoints + ACL tokens for cloud-init configuration.
+# EBS volumes (prometheus, shared) are created inside this same component
+# (modules/aws/4_compute/ebs.tf) so no cross-component reference needed.
 # ---------------------------------------------------------------------------
 
 component "compute" {
@@ -101,6 +154,13 @@ component "compute" {
     vpc_security_group_ids        = component.security.vpc_security_group_id
     aws_iam_instance_profile_name = component.vpc.aws_iam_instance_profile_name
     aws_key_pair_id               = component.vpc.aws_key_pair_id
+
+    # HCP values for cloud-init templates
+    hcp_consul_config_file = component.hcp_clusters.consul_config_file
+    hcp_consul_ca_file     = component.hcp_clusters.consul_ca_file
+    hcp_consul_acl_tokens  = component.hcp_config.consul_acl_tokens
+    vault_addr             = component.hcp_clusters.vault_private_endpoint
+    vault_token            = component.hcp_clusters.vault_admin_token
   }
 
   providers = {
@@ -111,7 +171,7 @@ component "compute" {
 }
 
 # ---------------------------------------------------------------------------
-# Layer 5 — Load balancers, DNS (Route 53 + ACM + ALBs), TLS
+# Layer 6 — Load balancers, DNS, TLS
 # ---------------------------------------------------------------------------
 
 component "load_balancer" {
