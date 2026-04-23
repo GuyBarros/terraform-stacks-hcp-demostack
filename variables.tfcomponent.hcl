@@ -84,6 +84,7 @@ variable "enterprise" {
 
 variable "nomadlicense" {
   type      = string
+  ephemeral = true
   sensitive = true
   default   = ""
 }
