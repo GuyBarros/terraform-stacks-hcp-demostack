@@ -110,7 +110,21 @@ export NOMAD_CLIENT_KEY="/etc/ssl/certs/me.key"
 EOF
 source /etc/profile.d/nomad.sh
 
-echo "--> Generating upstart configuration"
+echo "--> Writing Nomad startup wrapper (reads license from Vault at start time)"
+# Single-quoted delimiter stops bash expanding $(...) when writing the file.
+# Terraform has already substituted ${VAULT_ADDR} with the literal URL before
+# this script runs, so the actual address is embedded in the wrapper.
+sudo tee /usr/local/bin/nomad-start.sh > /dev/null <<'WRAPPERSCRIPT'
+#!/usr/bin/env bash
+# VAULT_TOKEN is inherited from the systemd [Service] environment.
+export VAULT_ADDR="${VAULT_ADDR}"
+export VAULT_NAMESPACE=admin
+export NOMAD_LICENSE=$(vault kv get -mount=nomad-config -field=value license 2>/dev/null || echo "")
+exec /usr/bin/nomad agent -config="/etc/nomad.d"
+WRAPPERSCRIPT
+sudo chmod +x /usr/local/bin/nomad-start.sh
+
+echo "--> Generating systemd unit"
 sudo tee /etc/systemd/system/nomad.service > /dev/null <<EOF
 [Unit]
 Description=Nomad
@@ -119,13 +133,11 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/nomad agent -config="/etc/nomad.d"
+ExecStart=/usr/local/bin/nomad-start.sh
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 Restart=on-failure
 LimitNOFILE=65536
-#Enterprise License
-Environment=NOMAD_LICENSE=${nomadlicense}
 Environment=VAULT_TOKEN=$(vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -period=72h)
 [Install]
 WantedBy=multi-user.target

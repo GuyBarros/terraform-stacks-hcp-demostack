@@ -90,7 +90,6 @@ data "cloudinit_config" "workers" {
       nomad_gossip_key = random_id.nomad_gossip_key.b64_std
       cni_plugin_url   = var.cni_plugin_url
       run_nomad_jobs   = var.run_nomad_jobs
-      nomadlicense     = var.nomadlicense
       region           = var.region
       index                        = count.index + 1
       count                        = var.workers

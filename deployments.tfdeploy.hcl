@@ -42,7 +42,7 @@ deployment "primary" {
     cni_plugin_url       = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
 
     enterprise   = true
-    nomadlicense = store.varset.hcp_credentials.nomad_ent_license
+    nomadlicense = ""  # Set via HCP Terraform Stack Variables UI (sensitive). Written to Vault by the vault_config component; never touches cloud-init.
 
     hcp_vault_cluster_tier    = "dev"
     hcp_boundary_cluster_tier = "standard"

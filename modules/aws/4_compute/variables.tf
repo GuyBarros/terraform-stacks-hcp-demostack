@@ -5,11 +5,6 @@ variable "enterprise" {
   default = false
 }
 
-variable "nomadlicense" {
-  default   = ""
-  sensitive = true
-  ephemeral = true
-}
 
 variable "instance_type_worker" {
   default = "t3.medium"

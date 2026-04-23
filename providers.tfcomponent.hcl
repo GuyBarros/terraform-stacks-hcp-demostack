@@ -9,6 +9,10 @@ required_providers {
     source  = "hashicorp/hcp"
     version = "~> 0.92"
   }
+  vault = {
+    source  = "hashicorp/vault"
+    version = "~> 4.0"
+  }
   tls = {
     source  = "hashicorp/tls"
     version = "~> 4.0.5"
@@ -44,3 +48,13 @@ provider "hcp" "this" {
 provider "tls" "this" {}
 provider "cloudinit" "this" {}
 provider "random" "this" {}
+
+# Vault provider is configured after hcp_clusters applies — Stacks resolves
+# the component output dependency automatically.
+provider "vault" "this" {
+  config {
+    address   = component.hcp_clusters.vault_public_endpoint
+    token     = component.hcp_clusters.vault_admin_token
+    namespace = "admin"
+  }
+}

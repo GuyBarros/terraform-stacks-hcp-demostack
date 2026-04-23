@@ -92,6 +92,23 @@ component "hcp_clusters" {
 }
 
 # ---------------------------------------------------------------------------
+# Vault config — writes the Nomad license into HCP Vault KV so instances
+# can read it at startup without the license touching cloud-init or state.
+# ---------------------------------------------------------------------------
+
+component "vault_config" {
+  source = "./modules/vault/config"
+
+  inputs = {
+    nomadlicense = var.nomadlicense
+  }
+
+  providers = {
+    vault = provider.vault.this
+  }
+}
+
+# ---------------------------------------------------------------------------
 # Compute — EC2 workers, configured via cloud-init with Vault credentials
 # ---------------------------------------------------------------------------
 
@@ -102,7 +119,6 @@ component "compute" {
     namespace                     = var.namespace
     public_key                    = var.public_key
     enterprise                    = var.enterprise
-    nomadlicense                  = var.nomadlicense
     instance_type_worker          = var.instance_type_worker
     run_nomad_jobs                = var.run_nomad_jobs
     workers                       = var.workers
