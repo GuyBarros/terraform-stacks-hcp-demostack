@@ -8,6 +8,7 @@ variable "enterprise" {
 variable "nomadlicense" {
   default   = ""
   sensitive = true
+  ephemeral = true
 }
 
 variable "instance_type_worker" {
