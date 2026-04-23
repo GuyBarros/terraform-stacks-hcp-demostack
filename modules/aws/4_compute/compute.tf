@@ -82,6 +82,7 @@ data "cloudinit_config" "workers" {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/workers/nomad.sh", {
       node_name        = "${var.namespace}-worker-${count.index}"
+      namespace        = var.namespace
       hcp_acl_token    = ""
       VAULT_ADDR       = var.vault_addr
       VAULT_TOKEN      = var.vault_token
@@ -134,7 +135,7 @@ resource "aws_instance" "workers" {
   # The vault_token and gossip key are bootstrap values — rotating them in
   # HCP does not require rebuilding the fleet. Set to true only deliberately
   # (e.g. during a full cluster repave).
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   user_data_base64            = element(data.cloudinit_config.workers[*].rendered, count.index)
 
   lifecycle {

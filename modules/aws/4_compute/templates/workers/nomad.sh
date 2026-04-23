@@ -37,13 +37,18 @@ region = "aws"
 
 advertise {
   http = "$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):4646"
-  rpc  = "$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):4647"
-  serf = "$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):4648"
+  rpc  = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4647"
+  serf = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4648"
 }
 server {
   enabled          = true
   bootstrap_expect = ${nomad_workers}
   encrypt          = "${nomad_gossip_key}"
+  server_join {
+    retry_join     = ["provider=aws tag_key=Purpose tag_value=${namespace} region=$AWS_REGION addr_type=private_v4"]
+    retry_max      = 0
+    retry_interval = "15s"
+  }
 }
 client {
   enabled = true
@@ -132,8 +137,11 @@ sudo systemctl start nomad
 
 echo "==> Run Nomad is Done!"
 
-echo "--> Configuring EBS mounts"
-sleep 5
+echo "--> Waiting for Nomad cluster to elect a leader"
+until nomad status > /dev/null 2>&1; do
+  echo "    ... waiting for Nomad leader"
+  sleep 10
+done
 
 sudo mkdir -p /etc/nomad.d/default_jobs/
 
@@ -265,7 +273,7 @@ sudo apt install -y jq
 
 echo "--> bootstraping Nomad ACLS"
 nomad acl bootstrap -json > /tmp/nomad_acls.json
-export NOMAD_TOKEN=$(jq -r .SecretID nomad_acls.json)
+export NOMAD_TOKEN=$(jq -r .SecretID /tmp/nomad_acls.json)
 echo "--> sending bootstrap token to Vault"
 vault secrets enable -version=2 -path=nomad kv
 sleep 10

@@ -1,6 +1,16 @@
 # outputs.tfcomponent.hcl
 
 # ---------------------------------------------------------------------------
+# Worker node access
+# ---------------------------------------------------------------------------
+
+output "worker_public_ips" {
+  description = "Public IPs of the worker nodes — use these to SSH (ubuntu@<ip>)."
+  type        = list(string)
+  value       = component.compute.worker_public_ips
+}
+
+# ---------------------------------------------------------------------------
 # Load balancer endpoints
 # ---------------------------------------------------------------------------
 

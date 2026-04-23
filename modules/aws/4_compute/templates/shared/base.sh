@@ -16,10 +16,8 @@ function install_from_url {
   }
 }
 
-source /etc/profile.d/ips.sh
-
 echo "--> Updating apt-cache"
-ssh-apt update
+sudo apt update
 
 
 
@@ -68,11 +66,10 @@ sudo apt-get install -y \
   curl \
   gnupg-agent \
   software-properties-common \
-  openjdk-14-jdk-headless \
+  openjdk-17-jdk-headless \
   prometheus-node-exporter \
   golang-go \
   alien \
-  waypoint \
   &>/dev/null
 
 
@@ -82,7 +79,7 @@ export CHECKPOINT_DISABLE=1
 EOF
 source /etc/profile.d/checkpoint.sh
 
-if [ ${enterprise} == 0 ]
+if [ "${enterprise}" == "false" ]
 then
 sudo apt-get install -y \
   vault \
@@ -105,15 +102,13 @@ fi
 #  sudo cp ~/.getenvoy/builds/standard/1.16.0/linux_glibc/bin/envoy /usr/bin/
 
 # envoy --version
-echo "---> Install latest Envoy"
+echo "---> Installing Envoy via apt.envoyproxy.io"
 sudo apt update
-sudo apt install apt-transport-https gnupg2 curl lsb-release
-curl -sL 'https://deb.dl.getenvoy.io/public/gpg.8115BA8E629CC074.key' | sudo gpg --dearmor -o /usr/share/keyrings/getenvoy-keyring.gpg
-Verify the keyring - this should yield "OK"
-echo a077cb587a1b622e03aa4bf2f3689de14658a9497a9af2c427bba5f4cc3c4723 /usr/share/keyrings/getenvoy-keyring.gpg | sha256sum --check
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/getenvoy-keyring.gpg] https://deb.dl.getenvoy.io/public/deb/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/getenvoy.list
+sudo apt install -y apt-transport-https gnupg2 curl lsb-release
+curl -sL 'https://apt.envoyproxy.io/signing.key' | sudo gpg --dearmor -o /usr/share/keyrings/envoy-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/envoy-keyring.gpg] https://apt.envoyproxy.io $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/envoy.list
 sudo apt update
-sudo apt install -y getenvoy-envoy
+sudo apt install -y envoy || echo "--> Envoy install skipped (distro may not be supported yet)"
 
 
 echo "==> Base is done!"
